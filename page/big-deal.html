@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>大宗交易</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="stylesheet" href="../lib/layui/dist/css/layui.css" media="all">
+  <link rel="stylesheet" href="../css/app.css">
+</head>
+<body>
+<div class="layout">
+  <div class="layout-head">
+    <div class="layout-head-logo">
+      <img src="../img/logo.png">
+    </div>
+    <div class="layout-head-logout">
+      <img src="../img/logo.png" class="user-head">
+      <a class="user-logout" style="cursor:pointer" onclick="userLogout()">退出登录</a>
+    </div>
+    <div class="layout-head-menu">
+      <ul class="layui-nav" lay-filter="">
+        <li class="layui-nav-item">
+          <a href="./market.html">行情交易</a>
+        </li>
+        <li class="layui-nav-item layui-this">
+          <a href="./big-deal.html">大宗交易</a>
+        </li>
+        <li class="layui-nav-item">
+          <a href="./asset_browse.html">我的资产</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="layout-bd" id="trade" v-cloak>
+    <div class="layout-side big-deal">
+      <ul>
+        <li class="big-menu-item " type="1"  v-bind:class="type == 1 ? activeClass : ''" @click="choise(1)">
+            <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M749.614 723.758h-399.92c-17.141 0-31.915-12.066-35.327-28.86L184.57 179.385 80.024 145.297c-16.906-10.511-22.09-32.738-11.579-49.647 10.51-16.904 32.748-22.096 49.647-11.575l117.739 42.28a36.014 36.014 0 0 1 16.288 23.43L379.146 651.66h345.793l165.794-252.17c7.2-18.552 28.094-27.763 46.653-20.569 18.55 7.203 27.765 28.087 20.566 46.65L783.217 700.743c-5.372 13.882-18.723 23.015-33.603 23.015zM721.002 307.86L591.08 454.94c-7.092 8.024-18.686 8.024-25.778 0l-129.947-147.08c-7.09-8.025-4.132-14.59 6.575-14.59h102.186V128.58c0-10.71 8.757-19.466 19.465-19.466h29.197c10.708 0 19.465 8.757 19.465 19.465v164.692h102.183c10.712 0 13.667 6.567 6.576 14.589zM348.61 881.754a62.5 62.5 0 1 0 127.914 0 62.5 62.5 0 1 0-127.914 0z m331.551 0a62.5 62.5 0 1 0 127.914 0 62.5 62.5 0 1 0-127.914 0z"></path></svg>
+          买入
+        </li>
+        <li class="big-menu-item " type="2" v-bind:class="type == 2 ? activeClass : ''" @click="choise(2)">
+          <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M676.864 747.328c-49.984 35.072-108.544 52.544-168.32 51.84-7.936-0.128-15.744-0.704-23.552-1.28-3.136-0.32-6.336-0.832-9.472-1.28-6.208-0.768-12.16-1.536-18.176-2.752-3.648-0.64-7.36-1.664-10.88-2.496-5.888-1.28-11.648-2.56-17.408-4.224-2.688-1.024-5.312-1.856-8-2.944-6.656-2.048-13.184-4.416-19.52-7.04-1.408-0.64-2.816-1.152-4.288-1.728-7.424-3.392-14.784-6.912-21.888-10.624-0.256-0.192-0.64-0.32-0.896-0.512-24.128-13.312-46.08-29.568-65.408-49.088-0.32-0.32-0.576-0.704-0.96-1.024-6.016-6.016-11.712-12.16-17.152-18.88-1.088-1.344-2.176-2.688-3.328-4.352-39.232-49.152-62.912-111.36-62.912-178.944l75.712 0L179.264 330.368 58.304 511.872l75.584 0c0 79.488 24.896 153.216 67.008 214.272 0.512 0.896 0.832 1.856 1.408 2.624 4.352 6.336 9.216 12.032 13.888 17.856 1.792 2.112 3.328 4.288 5.248 6.72 6.848 8.256 14.272 16.128 21.76 23.872 0.768 0.768 1.408 1.408 2.048 2.112 25.344 25.408 53.888 46.656 85.056 63.808 0.832 0.448 1.536 0.832 2.496 1.344 8.96 4.864 18.176 9.28 27.456 13.376 2.368 1.024 4.608 2.048 6.912 3.008 8.064 3.392 16.256 6.272 24.512 9.088 3.904 1.344 7.744 2.624 11.712 3.904 7.232 2.048 14.592 3.904 22.016 5.632 4.992 1.152 9.728 2.432 14.848 3.328 2.048 0.512 3.968 1.152 6.08 1.344 7.104 1.28 14.144 1.92 21.056 2.752 2.56 0.448 5.12 0.896 7.616 1.152 12.608 1.216 25.216 1.984 37.76 1.984 76.8 0 151.808-23.488 216.192-68.608 20.48-14.4 25.536-42.752 11.2-63.104C725.568 737.792 697.344 732.8 676.864 747.328M889.984 511.872c0-79.296-24.576-152.96-66.496-213.696-0.64-1.024-1.024-2.112-1.536-3.008-5.44-7.488-10.944-14.464-16.704-21.44-0.64-0.768-1.28-1.664-1.856-2.56-38.528-46.4-86.72-82.432-141.184-105.984-1.6-0.64-2.944-1.344-4.544-1.984-8.768-3.584-17.664-6.72-26.752-9.792-3.072-1.024-6.4-2.176-9.6-3.136C613.376 147.776 605.568 145.792 597.568 143.936c-4.416-0.96-8.96-2.112-13.376-3.008C581.952 140.544 579.968 139.904 577.6 139.456 571.648 138.496 565.76 137.92 559.744 137.216 555.584 136.704 551.616 136.064 547.392 135.616 537.344 134.656 527.36 134.272 517.376 134.08c-1.792 0-3.584-0.256-5.44-0.256-0.32 0-0.64 0.064-0.96 0.128C434.24 134.016 359.36 157.184 295.104 202.24c-20.48 14.336-25.536 42.624-11.072 63.232C298.304 285.888 326.72 290.944 347.264 276.48c49.6-34.688 107.456-52.352 166.848-51.776 8.512 0.064 17.024 0.448 25.28 1.28 2.56 0.192 5.056 0.576 7.616 0.96C553.856 227.84 560.64 228.736 567.296 230.144c2.88 0.512 5.888 1.28 8.64 1.92 6.656 1.472 13.056 3.008 19.456 4.992 2.112 0.576 4.032 1.28 6.016 2.048 7.424 2.368 14.656 4.928 21.568 7.872 0.768 0.192 1.472 0.768 2.176 1.024 42.368 18.176 79.424 46.144 108.416 81.216 0.064 0.128 0.192 0.384 0.448 0.576 40.768 49.664 65.216 113.024 65.28 182.08l-75.776 0 121.216 181.568 120.896-181.568L889.984 511.872 889.984 511.872zM889.984 511.872" p-id="4221"></path></svg>
+          转让
+        </li>
+      </ul>
+    </div>
+    <div class="layout-main" >
+      <div class="big-action">
+        <a class="big-deal-btn buy deal-buy" @click="deal_buy()">
+          <span class="big-deal-icon">
+            <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M749.614 723.758h-399.92c-17.141 0-31.915-12.066-35.327-28.86L184.57 179.385 80.024 145.297c-16.906-10.511-22.09-32.738-11.579-49.647 10.51-16.904 32.748-22.096 49.647-11.575l117.739 42.28a36.014 36.014 0 0 1 16.288 23.43L379.146 651.66h345.793l165.794-252.17c7.2-18.552 28.094-27.763 46.653-20.569 18.55 7.203 27.765 28.087 20.566 46.65L783.217 700.743c-5.372 13.882-18.723 23.015-33.603 23.015zM721.002 307.86L591.08 454.94c-7.092 8.024-18.686 8.024-25.778 0l-129.947-147.08c-7.09-8.025-4.132-14.59 6.575-14.59h102.186V128.58c0-10.71 8.757-19.466 19.465-19.466h29.197c10.708 0 19.465 8.757 19.465 19.465v164.692h102.183c10.712 0 13.667 6.567 6.576 14.589zM348.61 881.754a62.5 62.5 0 1 0 127.914 0 62.5 62.5 0 1 0-127.914 0z m331.551 0a62.5 62.5 0 1 0 127.914 0 62.5 62.5 0 1 0-127.914 0z"></path></svg>
+          </span>
+          我要买入
+        </a>
+        <a class="big-deal-btn sell deal-sell"  @click="deal_sell()">
+          <span class="big-deal-icon">
+            <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M676.864 747.328c-49.984 35.072-108.544 52.544-168.32 51.84-7.936-0.128-15.744-0.704-23.552-1.28-3.136-0.32-6.336-0.832-9.472-1.28-6.208-0.768-12.16-1.536-18.176-2.752-3.648-0.64-7.36-1.664-10.88-2.496-5.888-1.28-11.648-2.56-17.408-4.224-2.688-1.024-5.312-1.856-8-2.944-6.656-2.048-13.184-4.416-19.52-7.04-1.408-0.64-2.816-1.152-4.288-1.728-7.424-3.392-14.784-6.912-21.888-10.624-0.256-0.192-0.64-0.32-0.896-0.512-24.128-13.312-46.08-29.568-65.408-49.088-0.32-0.32-0.576-0.704-0.96-1.024-6.016-6.016-11.712-12.16-17.152-18.88-1.088-1.344-2.176-2.688-3.328-4.352-39.232-49.152-62.912-111.36-62.912-178.944l75.712 0L179.264 330.368 58.304 511.872l75.584 0c0 79.488 24.896 153.216 67.008 214.272 0.512 0.896 0.832 1.856 1.408 2.624 4.352 6.336 9.216 12.032 13.888 17.856 1.792 2.112 3.328 4.288 5.248 6.72 6.848 8.256 14.272 16.128 21.76 23.872 0.768 0.768 1.408 1.408 2.048 2.112 25.344 25.408 53.888 46.656 85.056 63.808 0.832 0.448 1.536 0.832 2.496 1.344 8.96 4.864 18.176 9.28 27.456 13.376 2.368 1.024 4.608 2.048 6.912 3.008 8.064 3.392 16.256 6.272 24.512 9.088 3.904 1.344 7.744 2.624 11.712 3.904 7.232 2.048 14.592 3.904 22.016 5.632 4.992 1.152 9.728 2.432 14.848 3.328 2.048 0.512 3.968 1.152 6.08 1.344 7.104 1.28 14.144 1.92 21.056 2.752 2.56 0.448 5.12 0.896 7.616 1.152 12.608 1.216 25.216 1.984 37.76 1.984 76.8 0 151.808-23.488 216.192-68.608 20.48-14.4 25.536-42.752 11.2-63.104C725.568 737.792 697.344 732.8 676.864 747.328M889.984 511.872c0-79.296-24.576-152.96-66.496-213.696-0.64-1.024-1.024-2.112-1.536-3.008-5.44-7.488-10.944-14.464-16.704-21.44-0.64-0.768-1.28-1.664-1.856-2.56-38.528-46.4-86.72-82.432-141.184-105.984-1.6-0.64-2.944-1.344-4.544-1.984-8.768-3.584-17.664-6.72-26.752-9.792-3.072-1.024-6.4-2.176-9.6-3.136C613.376 147.776 605.568 145.792 597.568 143.936c-4.416-0.96-8.96-2.112-13.376-3.008C581.952 140.544 579.968 139.904 577.6 139.456 571.648 138.496 565.76 137.92 559.744 137.216 555.584 136.704 551.616 136.064 547.392 135.616 537.344 134.656 527.36 134.272 517.376 134.08c-1.792 0-3.584-0.256-5.44-0.256-0.32 0-0.64 0.064-0.96 0.128C434.24 134.016 359.36 157.184 295.104 202.24c-20.48 14.336-25.536 42.624-11.072 63.232C298.304 285.888 326.72 290.944 347.264 276.48c49.6-34.688 107.456-52.352 166.848-51.776 8.512 0.064 17.024 0.448 25.28 1.28 2.56 0.192 5.056 0.576 7.616 0.96C553.856 227.84 560.64 228.736 567.296 230.144c2.88 0.512 5.888 1.28 8.64 1.92 6.656 1.472 13.056 3.008 19.456 4.992 2.112 0.576 4.032 1.28 6.016 2.048 7.424 2.368 14.656 4.928 21.568 7.872 0.768 0.192 1.472 0.768 2.176 1.024 42.368 18.176 79.424 46.144 108.416 81.216 0.064 0.128 0.192 0.384 0.448 0.576 40.768 49.664 65.216 113.024 65.28 182.08l-75.776 0 121.216 181.568 120.896-181.568L889.984 511.872 889.984 511.872zM889.984 511.872" p-id="4221"></path></svg>
+          </span>
+          我要转让
+        </a>
+          <a class="big-deal-btn order  deal-my" @click="Mine()">
+          <span class="big-deal-icon">
+            <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M832 928 192 928c-23.466667 0-42.666667-19.2-42.666667-42.666667l0-640c0-23.466667 19.2-42.666667 42.666667-42.666667l64 0c12.8 0 21.333333 8.533333 21.333333 21.333333 0 12.8-8.533333 21.333333-21.333333 21.333333L192 245.333333l0 640 640 0 0-640-64 0c-12.8 0-21.333333-8.533333-21.333333-21.333333 0-12.8 8.533333-21.333333 21.333333-21.333333l64 0c23.466667 0 42.666667 19.2 42.666667 42.666667l0 640C874.666667 908.8 855.466667 928 832 928zM704 757.333333 320 757.333333c-12.8 0-21.333333-8.533333-21.333333-21.333333 0-12.8 8.533333-21.333333 21.333333-21.333333l384 0c12.8 0 21.333333 8.533333 21.333333 21.333333C725.333333 748.8 716.8 757.333333 704 757.333333zM704 586.666667 320 586.666667c-12.8 0-21.333333-8.533333-21.333333-21.333333 0-12.8 8.533333-21.333333 21.333333-21.333333l384 0c12.8 0 21.333333 8.533333 21.333333 21.333333C725.333333 578.133333 716.8 586.666667 704 586.666667zM704 416 320 416c-12.8 0-21.333333-8.533333-21.333333-21.333333s8.533333-21.333333 21.333333-21.333333l384 0c12.8 0 21.333333 8.533333 21.333333 21.333333S716.8 416 704 416zM661.333333 245.333333 362.666667 245.333333c-12.8 0-21.333333-8.533333-21.333333-21.333333 0-12.8 8.533333-21.333333 21.333333-21.333333l298.666667 0c12.8 0 21.333333 8.533333 21.333333 21.333333C682.666667 236.8 674.133333 245.333333 661.333333 245.333333zM512 138.666667c-36.266667 0-64 27.733333-64 64l-42.666667 0c0-59.733333 46.933333-106.666667 106.666667-106.666667s106.666667 46.933333 106.666667 106.666667l-42.666667 0C576 166.4 548.266667 138.666667 512 138.666667z" p-id="1896"></path></svg>
+          </span>
+              我的订单
+          </a>
+      </div>
+
+
+        <div class="layui-row mine_order-time-search" style="flex: 1 1 auto;display: none" >
+            <div class="header-input layui-col-sm12" style="text-align: center;">
+                <div class="layui-inline"><label class="layui-form-label" style="width: 100px;">起始时间</label>
+
+                    <div class="layui-input-inline"><input type="text" id="startDay0"  class="layui-input" lay-key="1">
+                    </div>
+                </div>
+                <div class="layui-inline"><label class="layui-form-label" style="width: 100px;">结束时间</label>
+
+                    <div class="layui-input-inline"><input type="text" id="endDay0" class="layui-input" lay-key="2">
+                    </div>
+                </div>
+                <button @click="queryHistoryOrder()" class="layui-btn layui-btn-sm layui-btn-normal minleft">查询</button>
+            </div>
+        </div>
+
+
+        <div class="big-order" style="padding-bottom: 0px">
+            <table class="layui-table order-table" lay-skin="line" style="margin-bottom: 0px;">
+                <colgroup v-if="(isMine==='' &&  (type=='1' || type=='2'))">
+                    <col width="10%">
+                    <col width="10%">
+                    <col width="12%">
+                    <col width="10%">
+                    <col width="8%">
+                    <col width="10%">
+                    <col width="10%">
+                    <col width="20%">
+                </colgroup>
+                <colgroup v-if="isMine==='yes'">
+                    <col width="8%">
+                    <col width="10%">
+                    <col width="12%">
+                    <col width="8%">
+                    <col width="10%">
+                    <col width="10%">
+                    <col width="7.5%">
+                    <col width="7.5%">
+                    <col width="10%">
+                    <col width="6%">
+                    <col width="11%">
+                </colgroup>
+                <thead>
+                <tr style="background-color:#f8f8f8;">
+                    <th></th>
+                    <th>报价时间</th>
+                    <th>频道</th>
+                    <th>数量</th>
+                    <th>单价(元)</th>
+                    <th>总价(元)<br>(不含手续费)</th>
+                    <th >报价方向</th>
+
+                    <th v-if="isMine==='yes'" >
+                        成交量
+                    </th>
+                    <th v-if="isMine==='yes'" >
+                        成交总价
+                    </th>
+                    <th v-if="isMine==='yes'" >
+                        状态
+                    </th>
+                    <th >操作</th>
+
+                </tr>
+                </thead>
+            </table>
+
+        <div  style="height: 300px;overflow:auto;padding-top: 0px;" ref="orderScroll"
+             v-on:scroll.passive="orderScroll">
+            <table class="layui-table order-table" lay-skin="line" style="margin-top: 0px;">
+                <colgroup v-if="(isMine==='' &&  (type=='1' || type=='2'))">
+                    <col width="10%">
+                    <col width="10%">
+                    <col width="12%">
+                    <col width="10%">
+                    <col width="8%">
+                    <col width="10%">
+                    <col width="10%">
+                    <col width="20%">
+                </colgroup>
+                <colgroup v-if="isMine==='yes'">
+                    <col width="8%">
+                    <col width="10%">
+                    <col width="12%">
+                    <col width="8%">
+                    <col width="10%">
+                    <col width="10%">
+                    <col width="7.5%">
+                    <col width="7.5%">
+                    <col width="10%">
+                    <col width="6%">
+                    <col width="11%">
+                </colgroup>
+                <tbody v-for="item in list">
+                <tr>
+                    <td  >
+                        <img :src="item.codeInfo.headImg" class="order-channel-logo">
+                    </td>
+                    <td >
+                        <p class="order-channel-date">{{new Date(item.createTime).format('yyyy-MM-dd hh:mm:ss')}}</p>
+                    </td>
+                    <td >{{item.codeInfo.nickName}}</td>
+                    <td >{{item.count}}秒</td>
+                    <td >{{item.price/100}}</td>
+                    <td >{{f2(item.count*item.price)}}</td>
+                    <td >{{typeDesc[item.type]}}</td>
+                    <td v-if="type==1 && isMine==''" >
+                        <button class="order-channel-btn blk"
+                        @click="deal(item._id)">转让</button>
+                    </td>
+                    <td v-if="type==2 && isMine==''" >
+                        <button class="order-channel-btn blk"
+                        @click="deal(item._id)">买入</button>
+                    </td>
+
+                    <td v-if="isMine=='yes'">
+                        {{item.turnoverCount||0}}
+                    </td>
+                    <td v-if="isMine=='yes'" >
+                        {{f2(item.totalprice||0)}}
+                    </td>
+                    <td v-if="isMine=='yes'" >
+                        {{statusDesc[item.status]}}
+                    </td>
+
+                    <td v-if="isMine=='yes' && (item.status==1 || item.status == 4)" >
+                        <button class="order-channel-btn cancel-order"
+                        @click="cancel(item._id)">撤单</button>
+                    </td>
+
+                </tr>
+                </tbody>
+                <!--<thead id="tbhead">
+
+                </thead>
+                <tbody id="deallist">
+
+                </tbody>-->
+            </table>
+        </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+<script src="../lib/layui/dist/layui.all.js" charset="utf-8"></script>
+<script src="../util/index.js"></script>
+<script src="../lib/vue/vue.min.js" charset="utf-8"></script>
+<script src="../lib/host.js"></script>
+<script id="sellDialog" type="text/html">
+    <div class="trade-dialog ">
+        <div class="trade-form">
+            <form class="layui-form" onsubmit="return false;">
+            <div class="trade-form-item blk">
+                <div class="label">频道</div>
+                <div class="input left">
+                    <select name="code" lay-filter="sell">
+                        <option value="">请选择频道</option>
+                        {{# layui.each(d.code, function(index, item){ }}
+                        <option value="{{ item.code }}" headimg="{{ item.headimg}}" nickname="{{ item.nickname}}">
+                            {{ item.nickname}}
+                        </option>
+                        {{# }); }}
+                    </select>
+                </div>
+            </div>
+            <div class="trade-form-item blk">
+                <div class="label">买卖方向</div>
+                <div class="input left">
+                    <input type="text" name="typedesc" value="卖出">
+                </div>
+                <a class="append icon">
+                    <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M255.863389 447.784466l255.842922 255.842923 255.841899-255.842923z" p-id="2033"></path></svg>
+                </a>
+            </div>
+
+            <div class="trade-form-item blk">
+                <div class="label">单价</div>
+                <div class="input left">
+                    <input type="text" name="price" class="sell-order-price" lay-verify="required" autocomplete="off">
+                </div>
+                <a class="append icon">元</a>
+            </div>
+            <div class="trade-form-item trade-form-msg">
+
+                <div class="info">最低
+                    <span class="down deal_buy_min"></span>
+                </div>
+                <div class="info">最高
+                    <span class="up deal_buy_max"></span>
+                </div>
+
+            </div>
+            <div class="trade-form-item blk">
+                <div class="label">数量</div>
+                <div class="input left">
+                    <input type="text" name="count" value="" lay-verify="required" autocomplete="off">
+                </div>
+                <a class="append icon">秒</a>
+            </div>
+            <div class="trade-form-msg">可转数量
+                <span id="deal-owncount"></span>秒
+            </div>
+            <div class="trade-form-item blk">
+                <div class="label">总价</div>
+                <div class="input left">
+                    <input type="text" name="totalPrice" value="" class="sell-order-totalPrice" readonly>
+                </div>
+                <a class="append icon">
+                    元
+                </a>
+            </div>
+            <div class="trade-form-item blk" style="margin-top: 30px;">
+                <div class="label"></div>
+                <div class="input left">
+                    <input type="hidden" name="type" value="2">
+                    <button class="btn-cancel sell-cancel">取消</button>
+                    <button class="btn-confirm blk" lay-submit lay-filter="sell">确定</button>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+
+
+</script>
+<script id="orderDialog" type="text/html">
+    <div class="big-dialog" >
+        <div class="big-order">
+            <div class="big-order-item">
+                <label class="label">订单状态</label>
+                <div class="content">{{ d.typeDesc }}</div>
+            </div>
+            <div class="big-order-item">
+                <label class="label">购买频道</label>
+                <div class="content">{{ d.nickName }}</div>
+            </div>
+            <div class="big-order-item">
+                <label class="label">价格</label>
+                <div class="content">{{ f2(d.price) }}元/秒</div>
+            </div>
+            <div class="big-order-item">
+                <label class="label">数量</label>
+                <div class="content">{{ d.count }}秒</div>
+            </div>
+            <div class="big-order-item">
+                <label class="label">{{ d.typeDesc }}金额</label>
+                <div class="content">{{ f2(d.totalPrice) }}元<span class="sxf">
+                    {{#  if(d.type == 1){ }}
+                        (含手续费{{ f2(d.fee)}}元)
+                    {{#  } }}
+                    {{#  if(d.type == 2){ }}
+                        (扣除手续费{{ f2(d.fee)}}元)
+                    {{#  } }}
+                    </span></div>
+            </div>
+        </div>
+        <div class="big-order-btn">
+            <button class="btn-cancel sell-cancel">取消</button>
+            <button class="btn-confirm sell-order">确认</button>
+        </div>
+    </div>
+
+</script>
+<script id="buyDialog" type="text/html">
+    <div class="trade-dialog " >
+        <form class="layui-form" >
+            <div class="trade-form">
+                <div class="trade-form-item blk">
+                    <div class="label">频道</div>
+                    <div class="input left">
+                        <select name="code" lay-filter="buy">
+                            <option value="">请选择频道</option>
+                            {{# layui.each(d.code, function(index, item){ }}
+                            <option value="{{ item.code }}" headimg="{{ item.headimg}}" nickname="{{ item.nickname}}">
+                                {{ item.nickname}}
+                            </option>
+                            {{# }); }}
+                        </select>
+                        <!--<input type="text" name="code" value="安徽卫视">-->
+                    </div>
+                    <!--<a class="append icon">-->
+                    <!--<svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M255.863389 447.784466l255.842922 255.842923 255.841899-255.842923z" p-id="2033"></path></svg>-->
+                    <!--</a>-->
+                </div>
+                <div class="trade-form-item blk">
+                    <div class="label">买卖方向</div>
+                    <div class="input left">
+                        <input type="text" name="desc" value="买入" readonly>
+                    </div>
+                    <a class="append icon">
+                        <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M255.863389 447.784466l255.842922 255.842923 255.841899-255.842923z"
+                                  p-id="2033"></path>
+                        </svg>
+                    </a>
+                </div>
+                <div class="trade-form-item blk">
+                    <div class="label">单价</div>
+                    <div class="input left">
+                        <input lay-verify="required" type="text" id="price" name="price" placeholder="购买金额"
+                               class="sell-order-price" autocomplete="off">
+                    </div>
+                    <a class="append icon">元</a>
+                </div>
+                <div class="trade-form-item ">
+
+                        <div class="info">最低
+                            <span class="down deal_buy_min"></span>
+                        </div>
+                        <div class="info">最高
+                            <span class="up deal_buy_max"></span>
+                        </div>
+
+                </div>
+                <div class="trade-form-item">
+                    <div class="label">数量</div>
+                    <div class="input left">
+                        <input type="text" id="count" name="count" value="{{ d.number }}" placeholder="购买时间（秒）"
+                               lay-verify="required" autocomplete="off">
+                    </div>
+                    <a class="append icon buy_seconds">
+                        秒
+                    </a>
+                </div>
+                <div class="trade-form-item">
+                    <div class="label">总价</div>
+                    <div class="input left">
+                        <input type="text" name="totalPrice" value="" class="sell-order-totalPrice" readonly>
+                    </div>
+                    <a class="append icon">
+                        元
+                    </a>
+                </div>
+                <input type=hidden value="1" name="type">
+
+                <div class="trade-form-item blk" style="margin-top: 30px;">
+                    <div class="label"></div>
+                    <div class="input left">
+                        <button class="btn-cancel" >取消</button>
+                        <button class="btn-confirm blk" lay-submit lay-filter="buy">购买</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+
+
+<script id="dealDialog" type="text/html">
+    <div class="big-dialog" >
+        <form class="layui-form"  >
+        <div class="big-order">
+            <div class="big-order-item">
+                <label class="label">订单状态</label>
+                <div class="content">{{ d.typeDesc }}</div>
+            </div>
+            <div class="big-order-item">
+                <label class="label">购买频道</label>
+                <div class="content">{{ d.nickName }}</div>
+            </div>
+            <div class="big-order-item">
+                <label class="label">价格</label>
+                <div class="content" ><span id="deal-price">{{ f2(d.price) }}</span>元/秒</div>
+            </div>
+            <div class="big-order-item">
+                <label class="label">数量</label>
+                <div class="input" style="border: 1px solid"><input type="text" name="count" value="{{ d.count }}" autocomplete="off"> </div>
+            </div>
+            {{#  if(d.type === 2){ }}
+
+            <div class="trade-form-msg" style="padding-left: 10px">
+                <div>可转数量：<span id="deal-owncount"></span>秒</div>
+            </div>
+
+            {{#  } }}
+            <div class="big-order-item">
+                <label class="label">发生金额</label>
+                <div class="content" >
+                    <span class="sell-order-totalPrice">{{f2( d.totalPrice) }}</span>元
+
+                    {{#  if(d.type == 1){ }}
+                        (含手续费<span class="deal_fee">{{ f2(d.fee)}}</span>元)
+                    {{#  } }}
+                    {{#  if(d.type == 2){ }}
+                        (扣除手续费<span class="deal_fee">{{ f2(d.fee)}}</span>元)
+                    {{#  } }}
+
+                </div>
+            </div>
+        </div>
+        <div class="big-order-btn">
+            <input type="hidden" name="orderId" value="{{ d.orderId }}">
+            <input type="hidden" name="action" value="3">
+            <button class="btn-cancel sell-cancel">取消</button>
+            <button class="btn-confirm" lay-submit lay-filter="deal">确认</button>
+        </div>
+            </form>
+    </div>
+
+</script>
+
+<script src="../lib/host.js"></script>
+<script src="../modules/common.js"></script>
+<script>
+  var layer = layui.layer
+  window.$ = layui.$
+  var dealList = {};
+  var form = layui.form;
+  var typeDesc = {
+      "1": "买入",
+      "2": "转让"
+  };
+  var statusDesc = {
+      1:"已报",
+      2:"已撤",
+      3:"已成",
+      4:"部成"
+  };
+  var pageSize = 2;
+  var laytpl = layui.laytpl;
+  var layer = layui.layer;
+  var orderType;
+
+
+
+
+  var laydate = layui.laydate;
+  laydate.render({
+      elem: '#startDay0',
+      max: 0,
+      showBottom: false,
+      done: function done(value) {
+          trade.searchTime.startTime = new Date(Date.parse(value.replace(/-/g,   "/"))).getTime();
+      }
+  });
+  laydate.render({
+      elem: '#endDay0',
+      max: 0,
+      showBottom: false,
+      done: function done(value) {
+          value = value+" 23:59:59";
+          trade.searchTime.endTime = new Date(Date.parse(value.replace(/-/g,   "/"))).getTime();
+      }
+  });
+
+    //输入价格，关联总价
+
+    function getTotalPrice(keyObj,type,windowType){
+        keyObj.keyup(function(data){
+            if(!isNumeric(data.key) && data.key!='.' && data.keyCode!=8){
+                layer.msg('必须是数字', {icon: 2,time:2000});
+                return;
+            }
+            var keyVal = keyObj.val();
+            if(validationNumber(keyVal)) {
+                if($('.sell-order-price').length>0){
+                    trade.price = Math.round($('.sell-order-price').val()*100);
+                }
+                if($(':input[name="count"]').length>0){
+                    trade.count = $(':input[name="count"]').val();
+                }
+                totalObj = $('.sell-order-totalPrice');
+                if(+trade.count>0) {
+                    var total;
+                    total = getTotalPriceNum(trade.price, trade.count, type);
+                    if(windowType){
+                        trade.fee = fee(trade.price,trade.count);
+                        $(".deal_fee").html(f2(trade.fee));
+                        totalObj.html(f2(total));
+                    }else{
+                        totalObj.val(f2(total));
+                    }
+                }
+            }
+        });
+    }
+
+    function getSelectValue(form,formData){
+        var selectValue = $(form).find("select").find('option');
+        layui.each(selectValue, function (index, key) {
+            if (key.value == formData.code) {
+                formData.headImg = $(this).attr('headimg');
+                formData.nickName = $(this).attr('nickname');
+            }
+        });
+        return formData;
+    }
+
+  //显示确认窗口
+  function showConfirmTips(formData,tplObj){
+
+      var getTpl = tplObj.html();
+      orderData = formData;
+      orderData['typeDesc'] = typeDesc[formData.type];
+      orderData.totalPrice = getTotalPriceNum(orderData.price,orderData.count,formData.type);
+      var strTpl = laytpl(getTpl).render(orderData);
+      layer.closeAll();
+      layer.open({
+          type: 1,
+          title: '确认订单',
+          shadeClose: true,
+          area: '380px',
+          skin: 'confirm-order',
+          content: strTpl
+      })
+
+  }
+
+
+
+  function getChannelInfo(channelPrice,priceObj,callback){
+//      getOpeningInfo(code,user.tvmid).then(function(res){
+          var p = +$(priceObj).val();
+          var topVal = f2(channelPrice *  1.3);
+          var minVal = f2(channelPrice *  0.7);
+          //p = p * 100;
+//          console.log('current',p,'topVal',topVal,'  minVal',minVal,channelPrice);
+          if(p>topVal){
+              layer.msg('价格不能超过最高价', {icon: 2,time:2000});
+              $(priceObj).focus();
+              return callback(false);
+          }
+          if(p<minVal){
+              layer.msg('价格不能小于最低价', {icon: 2,time:2000});
+              $(priceObj).focus();
+              return callback(false);
+          }
+
+          return callback(true);
+//      });
+  }
+
+
+
+
+
+
+  var trade = new Vue({
+      el:"#trade",
+      data(){
+      return {
+          loading: false,
+          list:[],
+          page:0,
+          limit: 5,
+          type:1,
+          isMine:'',
+          activeClass: 'active',
+          holdList:{},
+          account:0,
+          channelInfo:{},
+          searchTime:{},
+          price:null,
+          count:null,
+          totalprice:null
+      }
+  },
+  mounted:function(){
+        checkLogin(function(){})
+        this.lists()
+  },
+  methods: {
+      choise(type){
+          var _this = this
+          this.type = type
+          this.isMine = ''
+          this.list = [];
+          this.page = 0;
+          this.lists();
+          $('.mine_order-time-search').hide();
+      },
+
+      Mine(){
+          var _this = this
+          this.isMine = 'yes';
+          this.page = 0;
+          this.type = '';
+          this.list = [];
+          this.lists();
+          $('.mine_order-time-search').show();
+      },
+      queryHistoryOrder(){
+          var _this = this;
+          _this.Mine();
+      },
+      lists() {
+          getList(this.page,this.limit,this.type,this.isMine,this.searchTime).then(order => {
+              if (order.list.length > 0) {
+                  order.list.forEach(element => {
+                      if(element.type!=3){
+                          var turnoverCount = element.turnoverCount || 0;
+                          if(this.isMine==''){
+                              element.count = element.count - turnoverCount;
+                          }
+                          element.totalprice = 0;
+                          if(turnoverCount>0) {
+                              if (element.type == 1) {
+                                  //买入
+                                  element.totalprice = playMoney(element.price, turnoverCount);
+                              } else if (element.type == 2) {
+                                  element.totalprice = sellTotalMoney(element.price, turnoverCount);
+                              }
+                          }
+                          var rowData = {
+                              "type": element.type,
+                              "nickName": element.codeInfo.nickName,
+                              "price": element.price,
+                              "count": element.count,
+                              "orderId": element._id,
+                              "tvmId": element.tvmid,
+                              "code":element.code
+                          };
+                          localStorage.setItem(element._id, JSON.stringify(rowData));
+                      }
+
+                      this.list.push(element)
+                  })
+              }
+              if (order.list.length < this.limit) {
+                  return
+              }
+          })
+      },
+      getMoreInfo() {
+          var _this = this
+          getList(this.page,this.limit,this.type,this.isMine,this.searchTime).then(order => {
+              if (order.list.length > 0) {
+                  order.list.forEach(element => {
+                      var turnoverCount = element.turnoverCount || 0;
+                      if(this.isMine==''){
+                          element.count = element.count - turnoverCount;
+                      }
+                      element.totalprice = 0;
+                      if(turnoverCount>0) {
+                          if (element.type == 1) {
+                              //买入
+                              element.totalprice = playMoney(element.price, turnoverCount);
+                          } else if (element.type == 2) {
+                              element.totalprice = sellTotalMoney(element.price, turnoverCount);
+                          }
+                      }
+                      var rowData = {
+                          "type": element.type,
+                          "nickName": element.codeInfo.nickName,
+                          "price": element.price,
+                          "count": element.count,
+                          "orderId": element._id,
+                          "tvmId": element.tvmid,
+                          "code":element.code
+                      };
+                      localStorage.setItem(element._id, JSON.stringify(rowData));
+                      _this.list.push(element)
+                  })
+              }
+              if (order.list.length < this.limit) {
+                  return
+              }
+              _this.loading = false
+          })
+      },
+      trigger(dom, cb) {
+          var height = dom.clientHeight
+          var scrollTop = dom.scrollTop
+          var scrollHeight = dom.scrollHeight
+          if (scrollTop + height + 20 > scrollHeight) {
+              cb && cb()
+          }
+      },
+      orderScroll() {  //加载更多
+          var _this = this
+          var dom = this.$refs.orderScroll
+          this.trigger(dom, function () {
+
+              if (_this.loading === true) {
+                  return
+              }
+              _this.loading = true
+              _this.page = _this.page+1
+              _this.getMoreInfo()
+          })
+      },
+      deal_buy(){
+
+          var tvlist;
+          var _this = this;
+          _this.type = 1;
+          let params = {
+              tvmid: user.tvmid
+          }
+          getUserAccount(params).then(function (res) {
+              _this.account = res.canUsed;
+          });
+          $.get(`${HOST.server}/stock/getTvsList`, function (res) {
+              if (res.code == 200) {
+                  tvlist = res.data.list;
+              } else {
+                  throw new Error(res.errMsg)
+              }
+              var data = { //数据
+                  code: tvlist, price: 1, down: "1.64", up: "2.2", number: 60
+              };
+              var getTpl = $('#buyDialog').html();
+              var strTpl = laytpl(getTpl).render(data);
+
+
+              layer.open({
+                  type: 1,
+                  title: '买入',
+                  shadeClose: true,
+                  area: '380px',
+                  skin: 'confirm-order blk',
+                  content: strTpl
+              })
+              form.render();
+              var count = $(':input[name="count"]');
+//              var btnType = 1;
+//
+//              getTotalPrice($('.sell-order-price'),$('.sell-order-totalPrice'),count,btnType);
+//              getTotalPrice(count,$('.sell-order-totalPrice'),$('.sell-order-price'),btnType);
+              getTotalPrice($('.sell-order-price'),_this.type,false);
+              getTotalPrice(count,_this.type,false);
+
+
+              $(".btn-cancel").click(function () {
+                  layer.closeAll();
+                  return false;
+              });
+              var code ;
+              form.on('select(buy)', function(data){
+                  code = data.value;
+                  getOpeningInfo(code,user.tvmid).then(function(res){
+                      var maxVal = f2(res.opening_price *  1.3);
+                      var minVal = f2(res.opening_price *  0.7);
+//                      console.log('maxVal',maxVal,' minVal',minVal,' open value',res.opening_price);
+                      _this.channelInfo[code] = res.opening_price;
+                      $('.deal_buy_max').html(maxVal);
+                      $('.deal_buy_min').html(minVal);
+                  });
+              });
+              form.on('submit(buy)', function (data) {
+                  var str = data.form;
+                  var formData = {};
+                  formData = data.field;
+                  formData = getSelectValue(str,formData);
+                  formData.price = Math.round(formData.price * 100);
+                  formData.totalPrice = getTotalPriceNum(formData.price,formData.count,formData.type);
+                  formData.fee = fee(formData.price,formData.count);
+//                  console.log('formData submit buy',formData);
+
+//                  console.log("submit buy account",_this.account,'total',formData.totalPrice);
+                  if(_this.account<formData.totalPrice){
+                      layer.msg('金额不足', {icon: 2});
+                      return false;
+                  }
+                  var checkNum = checkCount(count);
+                  if(!checkNum){
+                      return false;
+                  }
+
+                  getChannelInfo(_this.channelInfo[code],$('.sell-order-price'),function(ret) {
+                      if (!ret) {
+                          return false;
+                      }
+                      //显示确认窗口
+                      var tplObj = $('#orderDialog');
+                      showConfirmTips(formData, tplObj);
+
+
+                      $(".sell-cancel").click(function () {
+                          layer.closeAll();
+                      });
+                      $('.sell-order').click(function () {
+                          var submitBtn = $(this);
+                          submitBtn.attr('disabled', 'true');
+                          formData.tvmid = user.tvmid;
+//                          console.log("buy confrim order formData", formData);
+
+                          $.post(`${HOST.server}/stock/addOrder`, formData, function (res) {
+                              if (res.code != '200') {
+                                  submitBtn.removeAttr("disabled");
+                                  layer.msg('提交错误，错误原因' + res.errMsg, {icon: 2});
+                                  return false;
+                              } else {
+                                  layer.msg('提交成交', {time: 3000, icon: 1}, function () {
+                                      layer.closeAll();
+                                      _this.choise(_this.type);
+                                  });
+
+                              }
+                          });
+                      })
+                  });
+                  return false;
+              });
+
+
+          });
+      },
+      deal_sell(){
+              var tvlist = [];
+              var _this = this;
+              _this.type = 2;
+              $.get(`${HOST.server}/stock/getTvsList`, function (res) {
+                  if (res.code == 200) {
+                      tvlist = res.data.list;
+
+                      var data = { //数据
+                          code: tvlist
+                      };
+                      var getTpl = $('#sellDialog').html();
+                      var strTpl = laytpl(getTpl).render(data);
+                      layer.open({
+                          type: 1,
+                          title: '卖出',
+                          shadeClose: true,
+                          area: '380px',
+                          skin: 'confirm-order blk',
+                          content: strTpl
+                      });
+                      form.render();
+                      //取消按钮
+                      $(".btn-cancel").click(function(){
+                          layer.closeAll();
+                      });
+
+
+                      var code ;
+                      form.on('select(sell)', function(data){
+                          code = data.value;
+                          getOpeningInfo(code,user.tvmid).then(function(res){
+                              var maxVal = f2(res.opening_price *  1.3);
+                              var minVal = f2(res.opening_price *  0.7);
+//                              console.log('maxVal',maxVal,' minVal',minVal,' open value',res.opening_price);
+                              _this.channelInfo[code] = res.opening_price;
+                              $('.deal_buy_max').html(maxVal);
+                              $('.deal_buy_min').html(minVal);
+                          });
+                          let params = {
+                              "tvmid":user.tvmid,
+                              "code":code
+                          }
+                          getUserSeconds(params).then(function(res){
+                                _this.holdList[code] = res.canUsed;
+//                              console.log('holdList',_this.holdList);
+                              $('#deal-owncount').html(res.canUsed);
+                          });
+                      });
+
+                      var count = $(':input[name="count"]');
+//                      var btnType = 2;
+//                      getTotalPrice($('.sell-order-price'),$('.sell-order-totalPrice'),count,btnType);
+//                      getTotalPrice(count,$('.sell-order-totalPrice'),$('.sell-order-price'),btnType);
+//
+                      getTotalPrice($('.sell-order-price'),_this.type,false);
+                      getTotalPrice(count,_this.type,false);
+
+
+
+
+                      form.on('submit(sell)', function (data) {
+                          var str = data.form;
+                          var formData = {};
+                          formData = data.field;
+                          formData = getSelectValue(str,formData);
+
+//                          console.log('sell code',formData.count);
+                          if(_this.holdList[code]< formData.count){
+                              layer.msg('转让数量大于可转数量', {icon: 2});
+                              return false;
+                          }
+                          var checkNum = checkCount(count);
+                          if(!checkNum){
+                              return false;
+                          }
+
+//                          console.log("submit sell formData",formData);
+                          formData.price = Math.round(formData.price * 100);//改成分
+                          formData.totalPrice = getTotalPriceNum(formData.price,formData.count,formData.type);
+                          formData.fee = fee(formData.price,formData.count);
+
+//                          console.log("buy confrim order formData", formData);
+
+                          getChannelInfo(_this.channelInfo[code],$('.sell-order-price'),function(ret){
+                              if(!ret){
+                                  return false;
+                              }
+//                              显示确认窗口
+
+                              var tplObj = $('#orderDialog');
+                              showConfirmTips(formData,tplObj);
+
+
+                              $(".sell-cancel").click(function () {
+                                  layer.closeAll();
+                              });
+                              $('.sell-order').click(function () {
+                                  var submitBtn = $(this);
+                                  submitBtn.attr('disabled','true');
+//                                  formData.price = f2(formData.price*100*100);
+                                  formData.tvmid = user.tvmid;
+//                                  console.log("sell confirm",formData);
+                                  $.post(`${HOST.server}/stock/addOrder`, formData, function (res) {
+                                      if (res.code != '200') {
+                                          submitBtn.removeAttr("disabled");
+                                          layer.msg('提交错误，错误原因' + res.errMsg, {icon: 2});
+                                          return false;
+                                      } else {
+                                          layer.msg('提交成交', {time: 3000, icon: 2});
+                                          layer.closeAll();
+//                                          location.href = "./big-deal.html";
+//                                          _this.deal_sell();
+                                          _this.choise(_this.type);
+                                      }
+                                  });
+                              })
+
+
+                          });
+
+
+                          return false;
+                      });
+                  }
+              });
+      },
+      deal(id){
+          //dealDialog
+          var _this = this;
+          var data = localStorage.getItem(id);
+          var dataObj = JSON.parse(data);
+          var tplObj = $('#dealDialog');
+
+          //获取可用数量ownCount
+//          console.log("deal info",dataObj);
+          dataObj['action'] = 3;
+          if (dataObj.type == 1) {
+              dataObj['buyTvmid'] = dataObj.tvmId;
+              //原买单
+              dataObj.type = 2;
+          } else if (dataObj.type == 2) {
+              dataObj['sellTvmid'] = dataObj.tvmId;
+              dataObj.type = 1;
+          }
+          dataObj.fee = fee(dataObj.price,dataObj.count);
+
+
+          showConfirmTips(dataObj, tplObj);
+          var countObj = $(':input[name="count"]');
+          if (dataObj.type == 2) {
+              //原买单
+              let params = {
+                  "tvmid":user.tvmid,
+                  "code":dataObj.code
+              }
+              getUserSeconds(params).then(function(res){
+                  _this.holdList[dataObj.code] = res.canUsed;
+                  $('#deal-owncount').html(res.canUsed);
+              });
+          }
+
+//          getDealTotalPrice(dataObj.price, totalObj, countObj,dataObj.type);
+//          console.log("deal info",dataObj);
+          _this.price = dataObj.price;
+
+          getTotalPrice(countObj,dataObj.type,true);
+
+          $(".sell-cancel").click(function () {
+              layer.closeAll();
+              return false;
+          });
+
+          //确认提交
+          form.on('submit(deal)', function (data) {
+
+              var checkNum = checkCount(countObj);
+              if(!checkNum){
+                  return false;
+              }
+              var formData = data.field;
+
+              if(dataObj.type == 2) {
+                  if (formData.count > dataObj.count) {
+                      layer.msg('不能大于订单原数量', {icon: 2, time: 2000});
+                      return false;
+                  }
+                  if(_this.holdList[dataObj.code]< formData.count){
+                      layer.msg('转让数量大于可转数量', {icon: 2});
+                      return false;
+                  }
+              }
+              dataObj.price = Math.round(dataObj.price);
+              formData.price = dataObj.price;
+              var totalPrice = getTotalPriceNum(formData.price, formData.count, dataObj.type);
+
+              delete dataObj['totalPrice'];//删除原订单总额
+              dataObj['totalprice'] = totalPrice;
+              dataObj['count'] = formData.count;
+              dataObj['tvmid'] = user.tvmid;
+              dataObj['fee'] = _this.fee || dataObj.fee;
+//              console.log( "dataObj",dataObj);
+              var submitBtn = $(this);
+              submitBtn.attr('disabled', 'true');
+              $.post(`${HOST.server}/stock/updataOrder`, dataObj, function (res) {
+                  if (res.code != '200') {
+                      submitBtn.removeAttr("disabled");
+                      layer.msg('提交错误，错误原因' + res.errMsg, {icon: 2});
+                      return false;
+                  } else {
+                      layer.msg('提交成交', {time: 3000, icon: 1}, function () {
+                          layer.closeAll();
+//                          location.href = "./big-deal.html";
+                          _this.choise(_this.type);
+                      });
+                  }
+              });
+              return false;
+          });
+      },
+      cancel(orderId){
+          var _this = this;
+          var dataObj = localStorage.getItem(orderId);
+          var dataObj = JSON.parse(dataObj);
+          layer.confirm('确认要撤单', function(index){
+              //确定的话
+              dataObj['action'] = 2;
+
+              $.post(`${HOST.server}/stock/updataOrder`, dataObj, function (res) {
+                  if (res.code != '200') {
+                      layer.msg('提交错误，错误原因' + res.errMsg, {icon: 2});
+                      return false;
+                  } else {
+                      layer.msg('提交成交', {time: 3000, icon: 1},function(){
+                          _this.Mine();
+
+                      });
+                  }
+              });
+
+              layer.close(index);
+          });
+      },
+
+
+
+  }
+  })
+
+  //列表
+  function getList(page,pageSize,type,isMine,searchTime) {
+      let params = {
+          page: page,
+          pageSize:pageSize,
+          type:type,
+          isMine:isMine
+      }
+      if(isMine=='yes' ){
+          if(getJsonLength(searchTime)==2){
+              params.startTime = searchTime.startTime;
+              params.endTime = searchTime.endTime;
+          }
+
+      }
+//      console.log(params);
+      return $.get(`${HOST.server}/stock/orders`, params).then(predeal)
+  }
+
+function getUserAccount(params){
+    return $.get(`${HOST.server}/stock/usableMoney`, params).then(predeal)
+}
+  function getUserSeconds(params){
+      return $.get(`${HOST.server}/stock/usableSeconds`, params).then(predeal)
+  }
+
+  function getTotalPriceNum(price,count,type){
+      var total;
+      if(type==1){
+          //买
+          total = playMoney(price,count);
+      }
+      if(type == 2){
+          //卖
+          total = sellTotalMoney(price,count);
+      }
+      return total;
+  }
+
+
+
+function checkCount(countObj){
+    if($(countObj).val()%60>0){
+        layer.msg('数量必须是60的倍数', {icon: 2,time:2000});
+        return false;
+    }
+    return true;
+}
+
+
+</script>
+</body>
+</html>

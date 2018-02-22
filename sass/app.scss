@@ -1,0 +1,23 @@
+* {
+  box-sizing: border-box;
+
+  &:before,
+  &:after {
+    box-sizing: inherit;
+  }
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  min-width: 1200px;
+}
+[v-cloak] {
+  display: none!important;
+}
+@import "./layout";
+@import "./login";
+@import "./market";
+@import "./big-deal";
+@import "./asset";

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>资产</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="stylesheet" href="../lib/layui/dist/css/layui.css" media="all">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../lib/iview/styles/iview.css">
+</head>
+<style type="text/css">
+  th { background: #f8f8f8}
+  .ivu-form-item{width:500px; margin: 10px;}
+  .ivu-form-item-content{margin 2px;}
+</style>
+<body>
+<div class="layout" id="app" v-cloak>
+  <div class="layout-head">
+    <div class="layout-head-logo">
+      <img src="../img/logo.png">
+    </div>
+    <div class="layout-head-logout">
+      <img src="../img/logo.png" class="user-head">
+      <a class="user-logout" style="cursor:pointer" onclick="userLogout()">退出登录</a>
+    </div>
+    <div class="layout-head-menu">
+      <ul class="layui-nav">
+        <li class="layui-nav-item">
+          <a href="./market.html">行情交易</a>
+        </li>
+        <li class="layui-nav-item">
+          <a href="./big-deal.html">大宗交易</a>
+        </li>
+        <li class="layui-nav-item layui-this">
+          <a href="asset_browse.html">我的资产</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="layout-bd">
+    <div class="layout-side asset">
+      <ul class="asset-menu">
+        <li class="asset-menu-item">
+          <a href="" class="link">
+            <span class="shu-icon"></span>
+            我的账户
+          </a>
+          <ul>
+            <li class="asset-menu-item second ">
+              <a href="./asset_browse.html" class="link">
+                <span class="kuai-icon"></span>
+                账户总览
+              </a>
+            </li>
+            <li class="asset-menu-item second">
+              <a href="./asset.html" class="link">
+                <span class="kuai-icon"></span>
+                我的持仓
+              </a>
+            </li>
+            <li class="asset-menu-item second">
+              <a href="./asset_buying.html" class="link">
+                <span class="kuai-icon"></span>
+                我的抢购
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="asset-menu-item">
+          <a href="" class="link">
+            <span class="shu-icon"></span>
+            其他
+          </a>
+          <ul>
+            <li class="asset-menu-item second active" v-if="isChild">
+              <a href="./children.html" class="link">
+                <span class="kuai-icon"></span>
+                子账户
+              </a>
+            </li>
+            <li class="asset-menu-item second">
+              <a href="./edit_password.html" class="link">
+                <span class="kuai-icon"></span>
+                修改密码
+              </a>
+            </li>
+            <!--<li class="asset-menu-item second">
+              <a href="http://dshb-cdn.mtq.tvm.cn/static/release/html/tvhTD_lovetime/tuwen/56/1e/3e/935B3G9MAA_1.html" target="_blank" class="link">
+                <span class="kuai-icon"></span>
+                帮助及规则
+              </a>
+            </li>-->
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="layout-main">
+      <div class="assets-list">
+        <div class="list-table">
+          <div class="list-table-bd">
+            <button type="button" class="ivu-btn ivu-btn-primary" @click="addUser('','','')"><!----> <!----> <span>创建子账号</span></button>
+            <table class="layui-table order-table" lay-skin="line">
+              <colgroup>
+                <col>
+                <col>
+                <col>
+              </colgroup>
+              <thead>
+              <tr>
+                <th>用户名称</th>
+                <th>开户时间</th>
+                <th>备注</th>
+                <th>操作</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="item in listData">
+                  <td>{{item.userName}}</td>
+                  <td>{{item.creatTime}}</td>
+                  <td>{{item.remark}}</td>
+                  <td>
+                    <div class="ivu-table-cell">
+                      <!----> <!----> <!----> <!----> <!---->
+                      <button type="button" class="ivu-btn ivu-btn-primary ivu-btn-small" @click="addUser(item.userName,item.remark,1)">
+                        <!----> <!---->
+                        <span>修改</span>
+                      <!----> <!----> <!----> <!----> <!---->
+                      </button>
+                    <button type="button" class="ivu-btn ivu-btn-error ivu-btn-small" @click="del(item.userName)">
+                      <!----> <!---->
+                      <span>删除</span>
+                    </button>
+                      </div>
+                  </td>
+              </tr>
+              <tr v-if="listData.length==0">
+                <td colspan="4">暂无数据</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <input type="hidden" id="userName" value="">
+<script src="../lib/layui/dist/layui.all.js" charset="utf-8"></script>
+<script src="../lib/vue/vue.min.js" charset="utf-8"></script>
+<script src="../lib/host.js"></script>
+<script src="../modules/common.js"></script>
+<script>
+  window.$ = layui.$
+  Date.prototype.format = function (format) {
+    var o = {
+      'M+': this.getMonth() + 1, // month
+      'd+': this.getDate(), // day
+      'h+': this.getHours(), // hour
+      'm+': this.getMinutes(), // minute
+      's+': this.getSeconds(), // second
+      'q+': Math.floor((this.getMonth() + 3) / 3), // quarter
+      'S': this.getMilliseconds() // millisecond
+    }
+
+    if (/(y+)/.test(format)) {
+      format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length))
+    }
+
+    for (var k in o) {
+      if (new RegExp('(' + k + ')').test(format)) {
+        format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ('00' + o[k]).substr(('' + o[k]).length))
+      }
+    }
+    return format
+  }
+  function getDate (timeStamp) {
+    return new Date(timeStamp).format('yyyy/MM/dd hh:mm:ss')
+  }
+  var app5 = new Vue({
+    el: '#app',
+    data: {
+      listData:[],
+      isChild:true
+    },
+    mounted:function(){
+      this.init();
+    },
+    methods :{
+      init:function(){
+        var event=this;
+        checkLogin(function() {
+          event.list();
+          return app5.isChild=user.isChild ? false : true;
+        })
+      },
+      list:function(){
+        $.get(`${HOST.server}/stock/acountList`,function(msg){
+          if(msg.status =='success'){
+            var account=msg.data;
+            return app5.listData=account
+          }else{
+           return app5.listData=[]
+          }
+
+        })
+      }
+      ,del:function(userName){
+         if(!userName){
+           return false;
+         }
+        var event=this;
+        layer.confirm('确定删除此账户?',{icon: 3, title:'提示'}, function(index){
+          //提交表单
+          var data={userName:userName}
+          $.post(`${HOST.server}/stock/delAccount`,data,function(msg){
+            if(msg.status=='success'){
+              event.list();
+            }else{
+              tanchuang('删除失败');
+            }
+
+          })
+          layer.close(index);
+        });
+      },
+      addUser:function(oldName,remark,name){
+        var _this = this
+        if(!name) {
+          var str = '<form class="ivu-form ivu-form-label-top" size="large"><div class="ivu-form-item"><div class="ivu-form-item-content"><label class="ivu-form-item-label">手机号:</label><input autocomplete="off" type="text" placeholder="用户名称" name="userName" class="ivu-input" value="' + oldName + '"></div><div class="ivu-form-item-content"><label class="ivu-form-item-label">密码:</label><input autocomplete="off" type="password" placeholder="密码" name="password" class="ivu-input"></div><div class="ivu-form-item-content"><label class="ivu-form-item-label">重复密码:</label><input autocomplete="off" type="password" placeholder="重复密码" name="password1" class="ivu-input"></div><div class="ivu-form-item-content"><label class="ivu-form-item-label">备注:</label><input autocomplete="off" type="text" placeholder="备注" name="remark" class="ivu-input"  value="' + remark + '"></div></div></form>'
+        }else{
+          var str = '<form class="ivu-form ivu-form-label-top" size="large"><div class="ivu-form-item"><div class="ivu-form-item-content"><label class="ivu-form-item-label">手机号:</label><input autocomplete="off" type="text" placeholder="用户名称" name="userName" class="ivu-input" value="' + oldName + '"></div><div class="ivu-form-item-content"><label class="ivu-form-item-label">新密码:</label><input autocomplete="off" type="password" placeholder="新密码" name="password" class="ivu-input"></div><div class="ivu-form-item-content"><label class="ivu-form-item-label">重复新密码:</label><input autocomplete="off" type="password" placeholder="重复新密码" name="password1" class="ivu-input"></div><div class="ivu-form-item-content"><label class="ivu-form-item-label">备注:</label><input autocomplete="off" type="text" placeholder="备注" name="remark" class="ivu-input"  value="' + remark + '"></div></div></form>'
+        }
+
+        layer.open({
+          title: '新增子账户',
+          shadeClose: true,
+          area: '520px',
+          content: str,
+          type:1,
+          btn: ['确认', '取消'],  
+          yes: function(index) {
+              var event=this;
+              var userName=$("input[name='userName']").val();
+              var remark=$("input[name='remark']").val();
+              var password=$("input[name='password']").val();
+              var password1=$("input[name='password1']").val();
+            if(password!='' || password1!='') {
+              if (password != password1) {
+                tanchuang("密码不一致");
+                return false;
+              }
+              if(password.length<6){
+                tanchuang("密码不能小于6位");
+                return false;
+              }
+            }
+              if(!userName){
+                tanchuang("请输入用户名称")
+                return false;
+              }else{
+                _this.edit(oldName,remark,userName,password,name,index)
+              }
+          }
+        });
+      },
+      edit:function(oldName,remark,userName,password,name,index){
+        var _this = this
+        var preg=/^1\d{10}$/
+        var sta=preg.test(userName);
+        if(!sta){
+          tanchuang("账户名称必须是手机号");
+          return false;
+        }
+        var data= {oldName:oldName,userName:userName,remark:remark,password:password,action:name}
+        $.post(`${HOST.server}/stock/edit`, data,function(res){
+          if (res.status !== 'success') {
+            tanchuang(res.errMsg)
+          }else{
+            layer.alert('操作成功', {icon: 1});
+            _this.list();
+            layer.close(index);
+          }
+        })
+      }
+    }
+  })
+  function tanchuang(msg){
+    layer.msg(msg, {icon: 5});
+  }
+</script>
+</body>
+</html>

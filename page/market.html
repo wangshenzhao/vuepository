@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>行情</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="stylesheet" href="../lib/layui/dist/css/layui.css" media="all">
+  <link rel="stylesheet" href="../css/app.css">
+</head>
+
+<body>
+  <div class="layout">
+    <div class="layout-head">
+      <div class="layout-head-logo">
+        <img src="../img/logo.png">
+      </div>
+      <div class="layout-head-logout">
+        <img src="../img/logo.png" class="user-head">
+        <a class="user-logout" style="cursor:pointer" onclick="userLogout()">退出登录</a>
+      </div>
+      <div class="layout-head-menu">
+        <ul class="layui-nav">
+          <li class="layui-nav-item layui-this">
+            <a href="./market.html">行情交易</a>
+          </li>
+          <li class="layui-nav-item">
+            <a href="./big-deal.html">大宗交易</a>
+          </li>
+          <li class="layui-nav-item">
+            <a href="asset_browse.html">我的资产</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="layout-bd" id='channelInfo' v-cloak>
+      <div class="layout-side" v-on:scroll.passive="channelScroll" ref="channelScroll">
+        <div class="channel-title">频道列表</div>
+        <div class="channel-list">
+          <div class="channel-item" v-for="item in tvLists" v-bind:class="item.code == code ? activeClass : ''" @click="choise(item.code)">
+            <div class="list-flex list-left-fill">
+              <div class="name">
+                <img :src="item.headimg">{{str(item.nickname,10)}}</imag>
+              </div>
+              <div class="code">{{item.code}}</div>
+            </div>
+            <div class="list-flex">
+              <div class="price">{{f2(item.commodity_price)}}</div>
+              <div class="rate" v-if="item.status !=1" v-bind:class="upOrDown(item.commodity_price, item.lastclosing_price || item.subscribe_price)">{{bili3(item) ? bili3(item) + '%' : null }}</div>
+              <div class="rate" v-if="item.status ==1 && compareTime(item.applybegintime,item.applyendtime)">新股抢购</div>
+              <div class="rate" v-if="item.status ==1 && !compareTime(item.applybegintime,item.applyendtime)">敬请期待</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="layout-main">
+        <div class="channel-info">
+          <div class="info-bd">
+            <div class="info-name">
+              <h3>{{tv.nickname}}</h3>
+              <span class="info-time">{{ tv.publish_time }}{{tv.status == 2 ? '('+ openState(tv.opening) + ')' : ''}}</span>
+            </div>
+            <div class="info-trade">
+              <div class="info-price" :class="upOrDown(tv.commodity_price,tv.lastclosing_price || tv.subscribe_price)">
+                <span class="price" v-if="tv.status == 2">{{ f2(tv.commodity_price)}}</span>
+                <span class="price" v-else-if="tv.status== 1 && new Date().getTime() > tv.introduct.applybegintime - 86400000">{{f2(tv.subscribe_price)}}</span>
+                <span class="price" v-else>--</span>                                            
+                <span class="rate">{{ bili(tv) ? gap2(tv) + '(' + bili2(tv) + '%)' : null}}</span>
+              </div>
+              <div class="info-data">
+                <div class="info-data-item">
+                  <div>开盘：
+                    <span class="black">{{ f2(tv.opening_price) }}元</span>
+                  </div>
+                  <div>成交：
+                    <span class="black">{{ fw2(tv.deal_price_sum) }}元</span>
+                  </div>
+                </div>
+                <div class="info-data-item">
+                  <div>最高：
+                    <span class="black">{{ f2(tv.commodity_max_price) }}元</span>
+                  </div>
+                  <div>最低：
+                    <span class="black">{{ f2(tv.commodity_min_price) }}元</span>
+                  </div>
+                </div>
+                <div class="info-data-item">
+                  <div>流通： 
+                    <span class="black">{{ f2(tv.publish_count/100) }}万秒</span>
+                  </div>
+                  <div>最新： 
+                    <span class="black">{{ f2(tv.commodity_price * 3600) }}元/时</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-action">
+            <button v-if="tv.status== 1 && new Date().getTime() > tv.introduct.applybegintime - 86400000 && new Date().getTime() < tv.introduct.applyendtime " class="layui-btn layui-btn-danger round" onclick="apply()">抢购</button>
+            <button v-if="tv.status== 2 && user && user.isSysAccount" class="layui-btn round" onclick="block()">大宗转让</button>
+            <button v-if="tv.status== 2" class="layui-btn layui-btn-warm round" onclick="buy()">购买</button>
+            <button v-if="tv.status== 2" class="layui-btn layui-btn-normal round" onclick="sell()">转让</button>
+          </div>
+        </div>
+        <div class="channel-detail">
+          <div class="channel-main">
+            <div class="layui-tab layui-tab-brief chart-tab" lay-filter="chart">
+              <ul class="layui-tab-title">
+                <li class="layui-this">实时价格</li>
+                <!-- <li>日K</li> -->
+              </ul>
+              <div class="layui-tab-content chart-container">
+                <div class="chart-box" id="minuteBox"></div>
+                <!-- <div class="chart-box" id="dayBox"></div> -->
+              </div>
+            </div>
+
+            <div class="layui-tab layui-tab-brief deal-tab" lay-filter="card">
+              <ul class="layui-tab-title">
+                <li class="layui-this">订单</li>
+                <li>已购</li>
+                <li>当日委托</li>
+                <li>当日成交</li>
+                <li>历史委托</li>
+                <li>历史成交</li>
+              </ul>
+              
+              <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                  <table class="layui-table chart-table scroll-header" lay-size="sm" lay-skin="nob">
+                      <colgroup>
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="20%">
+                        <col width="15%">
+                        <col width="15%">
+                      </colgroup>
+                      <thead>
+                        <tr>
+                          <th style="text-align:center">名称/代码</th>
+                          <th style="text-align:center">委托价(元)/时间</th>
+                          <th style="text-align:center">委托量/成交量</th>
+                          <th style="text-align:center">状态</th>
+                          <th style="text-align:center">操作</th>
+                        </tr>
+                      </thead>
+                  </table>
+                  <div class="scroll-order" ref="myOrderScroll" v-on:scroll.passive="myOrderScroll">
+                    <table class="layui-table table-body" lay-size="sm" lay-skin="nob">
+                      <colgroup>
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="20%">
+                        <col width="15%">
+                        <col width="15%">
+                      </colgroup>
+                      <tbody>
+                        <tr class="table-tr" v-for="item in orderList">
+                          <td>{{item.commodity_name}}<br/>{{item.commodity_code}}</td>
+                          <td>{{f2(item.order_price)}}<br/>{{item.create_time}}</td>
+                          <td>{{item.order_count}}<br/>{{item.order_finish_count}}</td>
+                          <td>{{orderType[item.order_type]}}<br/>{{orderStatus[item.cancel_status && item.cancel_status > item.status ? item.cancel_status : item.status]}}</td>
+                          <td>
+                            <button class="layui-btn layui-btn-sm" v-bind:class=" item.cancel_status && item.cancel_status > item.status ? 'layui-btn-primary' : 'layui-btn-danger'"  :disabled="item.cancel_status && item.cancel_status > item.status ? true : false"  v-on:click="cancelOrder($event,item._id)">撤单</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="layui-tab-item">
+                  <table class="layui-table chart-table scroll-header" lay-size="sm" lay-skin="nob">
+                      <colgroup>
+                        <col width="20%">
+                        <col width="20%">
+                        <col width="20%">
+                        <col width="20%">
+                        <col width="20%">
+                      </colgroup>
+                      <thead>
+                        <tr>
+                          <th style="text-align:center">名称/代码</th>
+                          <th style="text-align:center">价值(元)</th>
+                          <th style="text-align:center">持有/可转(秒)</th>
+                          <th style="text-align:center">现价/成本(元)</th>
+                          <th style="text-align:center">盈亏(元)</th>
+                        </tr>
+                      </thead>
+                  </table>
+                  <div class="scroll-order" ref="boughtScroll" v-on:scroll.passive="boughtScroll">
+                    <table class="layui-table table-body" lay-size="sm" lay-skin="nob">
+                      <colgroup>
+                        <col width="20%">
+                        <col width="20%">
+                        <col width="20%">
+                        <col width="20%">
+                        <col width="20%">
+                      </colgroup>
+                      <tbody>
+                        <tr class="table-tr" v-for="item in orderList" @click="choise(item.commodity_code)">
+                          <td>{{item.commodity_name}}<br/>{{item.commodity_code}}</td>
+                          <td>{{f2(item.market_value)}}</td>
+                          <td>{{item.hold_number}}<br/>{{item.hang_number}}</td>
+                          <td>{{f2(item.commodity_price)}}<br/>{{f2(item.cost_price)}}</td>
+                          <td :class="upOrDown(item.breakeven_price,0)">{{f2(item.breakeven_price)}}<br/> {{item.breakeven_percent + '%'}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div> 
+                </div>
+                <div class="layui-tab-item">
+                  <table class="layui-table chart-table scroll-header" lay-size="sm" lay-skin="nob">
+                      <colgroup>
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="25%">
+                      </colgroup>
+                      <thead>
+                        <tr>
+                          <th style="text-align:center">名称/代码</th>
+                          <th style="text-align:center">委托价(元)/时间</th>
+                          <th style="text-align:center">委托量/成交量</th>
+                          <th style="text-align:center">状态</th>
+                        </tr>
+                      </thead>
+                  </table>
+                  <div class="scroll-order" ref="todayOrderScroll" v-on:scroll.passive="todayOrderScroll">
+                    <table class="layui-table table-body" lay-size="sm" lay-skin="nob">
+                      <colgroup>
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="25%">
+                      </colgroup>
+                      <tbody>
+                        <tr class="table-tr" v-for="item in orderList">
+                          <td>{{item.commodity_name}}<br/>{{item.commodity_code}}</td>
+                          <td>{{f2(item.order_price)}}<br/>{{item.create_time}}</td>
+                          <td>{{item.order_count}}<br/>{{item.order_finish_count}}</td>
+                          <td>{{orderType[item.order_type]}}<br/>{{orderStatus[item.status]}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="layui-tab-item">
+                  <table class="layui-table chart-table scroll-header" lay-size="sm" lay-skin="nob">
+                      <colgroup>
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="25%">
+                      </colgroup>
+                      <thead>
+                        <tr>
+                          <th style="text-align:center">名称/代码</th>
+                          <th style="text-align:center">委托价(元)/时间</th>
+                          <th style="text-align:center">委托量/成交量</th>
+                          <th style="text-align:center">状态</th>
+                        </tr>
+                      </thead>
+                  </table>
+                  <div class="scroll-order" ref="todayDealScroll" v-on:scroll.passive="todayDealScroll">
+                    <table class="layui-table table-body" lay-size="sm" lay-skin="nob">
+                      <colgroup>
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="25%">
+                      </colgroup>
+                      <tbody>
+                        <tr class="table-tr" v-for="item in orderList"> 
+                          <td>{{item.commodity_name}}<br/>{{item.commodity_code}}</td>
+                          <td>{{f2(item.order_price)}}<br/>{{item.create_time}}</td>
+                          <td>{{item.order_count}}<br/>{{item.order_finish_count}}</td>
+                          <td>{{orderType[item.order_type]}}<br/>{{orderStatus[item.status]}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="layui-tab-item">
+                  <div class="layui-row" style="flex: auto;">
+                    <div class="header-input layui-col-sm12" style="text-align: center;">
+                      <div class="layui-inline">
+                      <label class="layui-form-label" style="width:100px">起始时间</label>
+                        <div class="layui-input-inline">
+                          <input type="text" class="layui-input" id="startDay0">
+                        </div>
+                      </div>
+                      <div class="layui-inline">
+                        <label class="layui-form-label" style="width:100px">结束时间</label>
+                        <div class="layui-input-inline">
+                          <input type="text" class="layui-input" id="endDay0">
+                        </div>
+                      </div>
+                      <button class="layui-btn layui-btn-normal layui-btn-sm minleft" onclick="queryHistoryOrder()">查询</button>
+                    </div>
+                  </div>
+                  <table class="layui-table chart-table scroll-header" lay-size="sm" lay-skin="nob">
+                      <colgroup>
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="25%">
+                      </colgroup>
+                      <thead>
+                        <tr>
+                          <th style="text-align:center">名称/代码</th>
+                          <th style="text-align:center">委托价(元)/时间</th>
+                          <th style="text-align:center">委托量/成交量</th>
+                          <th style="text-align:center">状态</th>
+                        </tr>
+                      </thead>
+                  </table>
+                  <div class="scroll-order" ref="hisOrderScroll" v-on:scroll.passive="hisOrderScroll">
+                    <table class="layui-table table-body" lay-size="sm" lay-skin="nob">
+                      <colgroup>
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="25%">
+                      </colgroup>
+                      <tbody>
+                        <tr class="table-tr" v-for="item in orderList">
+                          <td>{{item.commodity_name}}<br/>{{item.commodity_code}}</td>
+                          <td>{{f2(item.order_price)}}<br/>{{item.create_time}}</td>
+                          <td>{{item.order_count}}<br/>{{item.order_finish_count}}</td>
+                          <td>{{orderType[item.order_type]}}<br/>{{orderStatus[item.status]}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="layui-tab-item">
+                    <div class="layui-row" style="flex: auto;">
+                      <div class="header-input layui-col-sm12" style="text-align: center;">
+                        <div class="layui-inline">
+                        <label class="layui-form-label" style="width:100px">起始时间</label>
+                          <div class="layui-input-inline">
+                            <input type="text" class="layui-input" id="startDay1">
+                          </div>
+                        </div>
+                        <div class="layui-inline">
+                          <label class="layui-form-label" style="width:100px">结束时间</label>
+                          <div class="layui-input-inline">
+                            <input type="text" class="layui-input" id="endDay1">
+                          </div>
+                        </div>
+                        <button class="layui-btn layui-btn-normal layui-btn-sm minleft" onclick="queryHistoryDeal()">查询</button>
+                    </div>
+                  </div>
+                  <table class="layui-table chart-table scroll-header" lay-size="sm" lay-skin="nob">
+                    <colgroup>
+                      <col width="25%">
+                      <col width="25%">
+                      <col width="25%">
+                      <col width="25%">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                          <th style="text-align:center">名称/代码</th>
+                          <th style="text-align:center">委托价(元)/时间</th>
+                          <th style="text-align:center">委托量/成交量</th>
+                          <th style="text-align:center">状态</th>
+                        </tr>
+                    </thead>
+                  </table>
+                  <div class="scroll-order" ref="hisDealScroll" v-on:scroll.passive="hisDealScroll">
+                      <table class="layui-table table-body" lay-size="sm" lay-skin="nob">
+                        <colgroup>
+                          <col width="25%">
+                          <col width="25%">
+                          <col width="25%">
+                          <col width="25%">
+                        </colgroup>
+                        <tbody>
+                          <tr class="table-tr" v-for="item in orderList">
+                            <td>{{item.commodity_name}}<br/>{{item.commodity_code}}</td>
+                            <td>{{f2(item.order_price)}}<br/>{{item.create_time}}</td>
+                            <td>{{item.order_count}}<br/>{{item.order_finish_count}}</td>
+                            <td>{{orderType[item.order_type]}}<br/>{{orderStatus[item.status]}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--<div class="channel-five">-->
+            <!--&lt;!&ndash; <div class="layui-card five-dang">-->
+              <!--<div class="layui-card-header">卖盘五档</div>-->
+              <!--<div class="layui-card-body">-->
+                <!--<table class="layui-table" lay-skin="nob" lay-size="sm">-->
+                  <!--<colgroup>-->
+                    <!--<col width="40">-->
+                    <!--<col width="80">-->
+                    <!--<col>-->
+                  <!--</colgroup>-->
+                  <!--<tbody v-for="n in 5">-->
+                    <!--<tr v-if="tv.fiveCover.sell[5 - n]">-->
+                      <!--<td>卖{{6 - n}}</td>-->
+                      <!--<td v-bind:class="upOrDown(tv.fiveCover.sell[5 - n].price,tv.lastclosing_price || tv.subscribe_price)">{{f2(tv.fiveCover.sell[5 - n].price)}}元</td>-->
+                      <!--<td v-bind:class="upOrDown(tv.fiveCover.sell[5 - n].price,tv.lastclosing_price || tv.subscribe_price)">{{tv.fiveCover.sell[5 - n].count}}</td>-->
+                    <!--</tr>-->
+                    <!--<tr v-else>-->
+                      <!--<td>卖{{6 - n}}</td>-->
+                      <!--<td>&#45;&#45;</td>-->
+                      <!--<td>&#45;&#45;</td>-->
+                    <!--</tr>-->
+                  <!--</tbody>-->
+                <!--</table>-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="layui-card five-dang" style="margin-top: -1px;">-->
+              <!--<div class="layui-card-header">买盘五档</div>-->
+              <!--<div class="layui-card-body">-->
+                <!--<table class="layui-table" lay-skin="nob" lay-size="sm">-->
+                  <!--<colgroup>-->
+                    <!--<col width="40">-->
+                    <!--<col width="80">-->
+                    <!--<col>-->
+                  <!--</colgroup>-->
+                  <!--<tbody v-for="n in 5">-->
+                    <!--<tr v-if="tv.fiveCover.buy[n-1]">-->
+                      <!--<td>买{{n}}</td>-->
+                      <!--<td v-bind:class="upOrDown(tv.fiveCover.buy[n - 1].price,tv.lastclosing_price || tv.subscribe_price)">{{f2(tv.fiveCover.buy[n - 1].price)}}元</td>-->
+                      <!--<td v-bind:class="upOrDown(tv.fiveCover.buy[n - 1].price,tv.lastclosing_price || tv.subscribe_price)">{{tv.fiveCover.buy[n - 1].count}}</td>-->
+                    <!--</tr>-->
+                    <!--<tr v-else>-->
+                      <!--<td>买{{n}}</td>-->
+                      <!--<td>&#45;&#45;</td>-->
+                      <!--<td>&#45;&#45;</td>-->
+                    <!--</tr>-->
+                  <!--</tbody>-->
+                <!--</table>-->
+              <!--</div>-->
+            <!--</div> &ndash;&gt;-->
+            <!--&lt;!&ndash; <div class="layui-card five-dang" style="margin-top: -10px;">-->
+              <!--<div class="layui-card-header">成交明细</div>-->
+              <!--<table class="layui-table" lay-skin="nob" lay-size="sm" >-->
+                <!--<thead>-->
+                  <!--<tr>-->
+                    <!--<th>时间</th>-->
+                    <!--<th>价格</th>-->
+                    <!--<th>成交量</th>-->
+                  <!--</tr>-->
+                <!--</thead>-->
+              <!--</table>-->
+              <!--<div class="layui-card-body" style="height: 500px;overflow:auto;" ref="dealScroll" v-on:scroll.passive="dealScroll" >-->
+                <!--<table class="layui-table" lay-skin="nob" lay-size="sm">-->
+                  <!--<colgroup>-->
+                    <!--<col width="50">-->
+                    <!--<col width="80">-->
+                    <!--<col>-->
+                  <!--</colgroup>-->
+                  <!--<tbody>-->
+                    <!--<tr v-for="item in dealList">-->
+                      <!--<td>{{item.time}}</td>-->
+                      <!--<td v-bind:class="upOrDown(item.price,tv.lastclosing_price || tv.subscribe_price)">{{f2(item.price)}}</td>-->
+                      <!--<td v-bind:class="upOrDown(item.price,tv.lastclosing_price || tv.subscribe_price)">{{item.count}}</td>-->
+                    <!--</tr>-->
+                  <!--</tbody>-->
+                <!--</table>-->
+              <!--</div>-->
+            <!--</div> &ndash;&gt;-->
+          <!--</div>-->
+        </div>
+      </div>
+      <div class="trade-dialog hide" id="buyDialog">
+        <div class="trade-form">
+          <div class="trade-form-item blk">
+            <div class="input">
+              <input type="text" name="code" :value="trade.code">
+            </div>
+            <a class="append icon" v-on:click="initTrade(1)">
+              <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1040" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <path d="M430.72 782.4C229.44 782.4 66.272 622.08 66.272 424 66.272 225.92 229.44 65.28 430.72 65.28 632 65.28 795.2 225.92 795.2 424 795.2 622.08 632 782.4 430.72 782.4L430.72 782.4ZM1014.016 968 749.728 707.84C818.912 632.64 861.44 533.44 861.44 424 861.44 189.76 668.608 0 430.72 0 192.832 0 0 189.76 0 424 0 657.92 192.832 847.68 430.72 847.68 533.504 847.68 627.776 812.16 701.824 752.96L967.168 1014.08C980.128 1026.88 1001.088 1026.88 1014.016 1014.08 1026.976 1001.6 1026.976 980.8 1014.016 968L1014.016 968Z"
+                  p-id="1041"></path>
+              </svg>
+            </a>
+          </div>
+          <div class="trade-form-item blk">
+            <a class="prepend icon" v-on:click="calculate('price','minus')">
+              <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 458.816l1024 0 0 102.4L0 561.216 0 458.816z" p-id="4154"></path>
+              </svg>
+            </a>
+            <div class="input">
+              <input type="text" name="code" :step="0.01" :min="tv.limit_down" :max="tv.limit_up" ref="buyPrice" :value="f2(trade.price)" placeholder="购买金额（元）" v-on:change="inpuctChange('buyPrice','price')" >
+            </div>
+            <a class="append icon" v-on:click="calculate('price','add')">
+              <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 458.816l1024 0 0 102.4L0 561.216 0 458.816z" p-id="4039"></path>
+                <path d="M563.2 0l0 1024L460.8 1024l0-1024L563.2 0z" p-id="4040"></path>
+              </svg>
+            </a>
+          </div>
+          <div class="trade-form-item">
+            <div class="info">跌停
+              <span class="down">{{f2(tv.limit_down)}}</span>
+            </div>
+            <div class="info">涨停
+              <span class="up">{{f2(tv.limit_up)}}</span>
+            </div>
+          </div>
+          <div class="trade-form-item blk">
+            <a class="prepend icon" v-on:click="calculate('count','minus')">
+              <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 458.816l1024 0 0 102.4L0 561.216 0 458.816z" p-id="4154"></path>
+              </svg>
+            </a>
+            <div class="input">
+              <input type="text" name="code" ref="buyCount" :value="trade.count" placeholder="购买时间（秒）" v-on:change="inpuctChange('buyCount','count')">
+            </div>
+            <a class="append icon" v-on:click="calculate('count','add')">
+              <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 458.816l1024 0 0 102.4L0 561.216 0 458.816z" p-id="4039"></path>
+                <path d="M563.2 0l0 1024L460.8 1024l0-1024L563.2 0z" p-id="4040"></path>
+              </svg>
+            </a>
+          </div>
+          <div class="trade-form-item blk">
+            <button class="button" v-on:click="confirmOrder()">购买</button>
+          </div>
+        </div>
+      </div>
+      <div class="trade-dialog hide" id="sellDialog">
+        <div class="trade-form">
+          <div class="trade-form-item blk">
+            <div class="input">
+              <input type="text" name="code" :value="trade.code">
+            </div>
+            <a class="append icon" v-on:click="initTrade(2)">
+              <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1040" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <path d="M430.72 782.4C229.44 782.4 66.272 622.08 66.272 424 66.272 225.92 229.44 65.28 430.72 65.28 632 65.28 795.2 225.92 795.2 424 795.2 622.08 632 782.4 430.72 782.4L430.72 782.4ZM1014.016 968 749.728 707.84C818.912 632.64 861.44 533.44 861.44 424 861.44 189.76 668.608 0 430.72 0 192.832 0 0 189.76 0 424 0 657.92 192.832 847.68 430.72 847.68 533.504 847.68 627.776 812.16 701.824 752.96L967.168 1014.08C980.128 1026.88 1001.088 1026.88 1014.016 1014.08 1026.976 1001.6 1026.976 980.8 1014.016 968L1014.016 968Z"
+                  p-id="1041"></path>
+              </svg>
+            </a>
+          </div>
+          <div class="trade-form-item blk">
+            <a class="prepend icon" v-on:click="calculate('price','minus')">
+              <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 458.816l1024 0 0 102.4L0 561.216 0 458.816z" p-id="4154"></path>
+              </svg>
+            </a>
+            <div class="input">
+              <input type="text" name="code" ref="sellPrice" :step="0.01" :min="tv.limit_down" :max="tv.limit_up" :value="f2(trade.price)" placeholder="转让金额（元）" v-on:change="inpuctChange('sellPrice','price')">
+            </div>
+            <a class="append icon" v-on:click="calculate('price','add')">
+              <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 458.816l1024 0 0 102.4L0 561.216 0 458.816z" p-id="4039"></path>
+                <path d="M563.2 0l0 1024L460.8 1024l0-1024L563.2 0z" p-id="4040"></path>
+              </svg>
+            </a>
+          </div>
+          <div class="trade-form-item">
+            <div class="info">跌停
+              <span class="down">{{f2(tv.limit_down)}}</span>
+            </div>
+            <div class="info">涨停
+              <span class="up">{{f2(tv.limit_up)}}</span>
+            </div>
+          </div>
+          <div class="trade-form-item blk">
+            <a class="prepend icon" v-on:click="calculate('count','minus')">
+              <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 458.816l1024 0 0 102.4L0 561.216 0 458.816z" p-id="4154"></path>
+              </svg>
+            </a>
+            <div class="input">
+              <input type="text" name="code" ref="sellCount"  :value="trade.count" placeholder="转让时间（秒）" v-on:change="inpuctChange('sellCount','count')">
+            </div>
+            <a class="append icon" v-on:click="calculate('count','add')">
+              <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 458.816l1024 0 0 102.4L0 561.216 0 458.816z" p-id="4039"></path>
+                <path d="M563.2 0l0 1024L460.8 1024l0-1024L563.2 0z" p-id="4040"></path>
+              </svg>
+            </a>
+          </div>
+          <div class="trade-form-item blk">
+              <div class="info">可转数量
+                <span>{{block.canUsed}}</span>
+              </div>
+              <div class="info">
+                <span class="up">大额交易请走大宗</span>
+              </div>
+          </div>
+          <div class="trade-form-item blk">
+            <button class="button" v-on:click="confirmOrder()">转让</button>
+          </div>
+        </div>
+      </div>
+      <div class="order-dialog hide" id="orderDialog">
+        <div class="order-item">
+          <label class="label">订单状态</label>
+          <div class="content">{{trade.type === 1 ? "购买": "转让"}}</div>
+        </div>
+        <div class="order-item">
+          <label class="label">订单信息</label>
+          <div class="content">{{tv.nickname}}</div>
+        </div>
+        <div class="order-item">
+          <label class="label">订单价格</label>
+          <div class="content">{{f2(trade.price)}}元/秒</div>
+        </div>
+        <div class="order-item">
+          <label class="label">{{trade.type === 1 ? "购买时间" : "转让时间"}}</label>
+          <div class="content">{{trade.count}}秒</div>
+        </div>
+        <div class="order-item">
+          <label class="label">{{trade.type === 1 ? "支付金额" : "转让金额"}}</label>
+          <div class="content">{{trade.type === 1? f2(trade.price * trade.count + fee(trade.price,trade.count)) : f2(trade.price * trade.count - fee(trade.price,trade.count)) }}元
+            <span class="addi">{{ (trade.type === 1 ? '(含交易手续费': '(扣除交易手续费') + f2(fee(trade.price,trade.count)) +'元)'}}</span>
+          </div>
+        </div>
+        <div class="layui-form need-accept">
+          <input type="checkbox" lay-skin="primary" checked>
+          <span class="word">本人已阅读并同意
+            <a href="">《风险提示函》</a>
+            <a href="">《买者自负承诺函》</a>
+          </span>
+        </div>
+        <div class="trade-form-item blk">
+          <button class="button" v-on:click="tradeAction()">确认支付</button>
+        </div>
+      </div>
+      <div class="trade-dialog hide" id="applyDialog">
+          <div class="trade-form">
+            <div class="trade-form-item blk">
+              <div class="label">频道</div>
+              <div class="input left">
+                  <input class="layui-input layui-disabled" disabled type="text" name="code" :value="tv.code">
+              </div>
+            </div>
+            <div class="trade-form-item blk">
+                <div class="label">单价</div>
+                <div class="input left">
+                    <input class="layui-input layui-disabled" disabled type="text"  name="price" :value="f2(tv.subscribe_price)">
+                </div>
+                <a class="append icon">元</a>
+            </div>
+            <div class="trade-form-item blk">
+                <div class="label">数量</div>
+                <div class="input left">
+                  <input class="layui-input" type="text" name="count" :value="applyCount" ref="applyCount" v-on:input="countMoney()">
+                </div>
+            </div>
+            <div class="trade-form-item blk">
+                <div class="label">总金额</div>
+                <div class="input left">
+                    <input class="layui-input layui-disabled" disabled type="text"  name="money" :value="f2(tv.subscribe_price * applyCount)">
+                </div>
+                <a class="append icon">元</a>
+            </div>
+            <div class="trade-form-item blk">
+              <button class="button" v-on:click="applyOrder()">抢购</button>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+
+<script id="blockDialog" type="text/html">
+  <div class="trade-dialog" >
+    <div class="trade-form">
+        <form class="layui-form" onsubmit="return false;">
+        <div class="trade-form-item blk">
+          <div class="label">转让公司</div>
+          <div class="input left">
+            <select name="company" lay-verify="company">
+              <option value="">请选择公司</option>
+              {{# layui.each(d.companyList, function(index, item){ }}
+              <option value="{{ item.userId }}">
+                  {{ item.company}}
+              </option>
+              {{# }); }}
+            </select>
+          </div>
+        </div>
+        <div class="trade-form-item blk">
+            <div class="label">转让价格</div>
+            <div class="input left">
+                <input type="text" name="price" value="{{f2(d.price)}}" class="block-order-price" id="blockPrice" lay-verify="price" oninput="inputValue(event,'price')">
+            </div>
+            <a class="append icon">元</a>
+        </div>
+        <!-- {{#if (!user.isSuperAccount){ }}
+        <div class="trade-form-item">
+          <div class="info">最小
+            <span class="down">{{f2(d.openPrice * 0.7)}}</span>
+          </div>
+          <div class="info">最大
+            <span class="up">{{f2(d.openPrice * 1.3)}}</span>
+          </div>
+        </div>
+        {{# } }} -->
+        <div class="trade-form-item blk">
+            <div class="label">转让数量</div>
+            <div class="input left">
+                <input id="blockCount" type="text" name="count" value="{{d.count}}" lay-verify="count" oninput="inputValue(event,'count')">
+            </div>
+            <a class="append icon">秒</a>
+        </div>
+        <div class="trade-form-item">
+            <div class="info">可转数量
+              <span x>{{d.seconds}}</span>
+            </div>
+            <div class="info">金额
+              <span id="blockMoney"></span>
+            </div>
+        </div>
+        <div class="trade-form-item blk">
+            <button class="button" lay-submit lay-filter="block">转让</button>
+        </div>
+        </form>
+    </div>
+  </div>
+</script>
+
+  <script src="../lib/host.js"></script>
+  <!-- 此jquery ajax方法支持promise -->
+  <script src="../lib/layui/dist/layui.all.js" charset="utf-8"></script>
+  <!-- 图表 -->
+  <script src="../lib/echarts.min.js"></script>
+  <script src="../lib/socket.io-1.4.5.js"></script>
+  <script src="../lib/chart.js"></script>
+  <script src="../lib/anime.min.js"></script>
+  <!-- 方法 -->
+  <script src="../util/index.js"></script>
+  <!-- vue -->
+  <script src="../lib/vue/vue.min.js"></script>
+  <!-- 数据js -->
+  <script src="../modules/common.js"></script>  
+  <script src="../modules/market.js"></script>
+</body>
+
+</html>

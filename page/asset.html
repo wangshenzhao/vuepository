@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>资产</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="stylesheet" href="../lib/layui/dist/css/layui.css" media="all">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../lib/iview/styles/iview.css">
+</head>
+<style type="text/css">
+    th { background: #f8f8f8}
+</style>
+<body>
+<div class="layout" id="app"  v-cloak>
+  <div class="layout-head">
+    <div class="layout-head-logo">
+      <img src="../img/logo.png">
+    </div>
+    <div class="layout-head-logout">
+      <img src="../img/logo.png" class="user-head">
+      <a class="user-logout" style="cursor:pointer" onclick="userLogout()">退出登录</a>
+    </div>
+    <div class="layout-head-menu">
+      <ul class="layui-nav">
+        <li class="layui-nav-item">
+          <a href="./market.html">行情交易</a>
+        </li>
+        <li class="layui-nav-item">
+          <a href="./big-deal.html">大宗交易</a>
+        </li>
+        <li class="layui-nav-item layui-this">
+          <a href="./asset_browse.html">我的资产</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="layout-bd">
+    <div class="layout-side asset">
+      <ul class="asset-menu">
+        <li class="asset-menu-item">
+          <a href="" class="link">
+            <span class="shu-icon"></span>
+            我的账户
+          </a>
+          <ul>
+            <li class="asset-menu-item second">
+              <a href="./asset_browse.html" class="link">
+                <span class="kuai-icon"></span>
+                账户总览
+              </a>
+            </li>
+            <li class="asset-menu-item second active">
+              <a href="" class="link">
+                <span class="kuai-icon"></span>
+                我的持仓
+              </a>
+            </li>
+              <li class="asset-menu-item second">
+                  <a href="./asset_buying.html" class="link">
+                      <span class="kuai-icon"></span>
+                      我的抢购
+                  </a>
+              </li>
+          </ul>
+        </li>
+        <li class="asset-menu-item">
+          <a href="" class="link">
+            <span class="shu-icon"></span>
+            其他
+          </a>
+          <ul>
+            <li class="asset-menu-item second" v-if="isChild">
+              <a href="./children.html" class="link">
+                <span class="kuai-icon"></span>
+                子账户
+              </a>
+            </li>
+              <li class="asset-menu-item second">
+                  <a href="./edit_password.html" class="link">
+                      <span class="kuai-icon"></span>
+                      修改密码
+                  </a>
+              </li>
+            <!--<li class="asset-menu-item second">
+              <a href="http://dshb-cdn.mtq.tvm.cn/static/release/html/tvhTD_lovetime/tuwen/56/1e/3e/935B3G9MAA_1.html" target="_blank" class="link">
+                <span class="kuai-icon"></span>
+                帮助及规则
+              </a>
+            </li>-->
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="layout-main">
+      <div class="assets-list">
+        <div class="list-table">
+          <div class="list-table-bd" style="height: 400px;overflow:auto;" ref="orderScroll" v-on:scroll.passive="orderScroll">
+            <table class="layui-table order-table" lay-skin="line">
+              <colgroup>
+                <col>
+                <col>
+                <col>
+              </colgroup>
+              <thead>
+              <tr>
+                <th>名称/代码</th>
+                <th>价值(元)</th>
+                <th>持有/可转(秒)</th>
+                <th>现价/成本(元)</th>
+                <th>盈亏(元)</th>
+                <th>操作</th>
+              </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in list">
+                  <td>{{item.commodity_name}}<br/>{{item.commodity_code}}</td>
+                  <td ><span v-bind:class="['market_value'+item._id]" @mouseover="tishi('.market_value'+item._id,item.market_value/100)">{{fw2(item.market_value)}}</span></td>
+                  <td>
+                      <span v-bind:class="['hold_number'+item._id]" @mouseover="tishi('.hold_number'+item._id,item.hold_number+ '<br/>'+ item.hang_number)">{{fw(item.hold_number)}}<br/>{{fw(item.hang_number)}}</span>
+                  </td>
+                  <td><span  v-bind:class="['commodity_price'+item._id]" @mouseover="tishi('.commodity_price'+item._id,item.commodity_price/100+ '<br/>'+ item.cost_price/100)">{{fw2(item.commodity_price)}}<br/>{{fw2(item.cost_price)}}</span></td>
+                  <td v-bind:class="{up:item.breakeven_price>0,down:item.breakeven_price<0}"><span v-bind:class="['breakeven_price'+item._id]" @mouseover="tishi('.breakeven_price'+item._id,item.breakeven_price/100)">{{fw2(item.breakeven_price)}}<br/> {{item.breakeven_percent}}%</span></td>
+                  <td class="ivu-table-column-center">
+                    <div class="ivu-table-cell">
+                      <div class="ivu-dropdown">
+                        <div class="ivu-dropdown-rel">
+                          <a href="./market.html">行情</a>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../lib/layui/dist/layui.all.js" charset="utf-8"></script>
+<script src="../lib/host.js"></script>
+<script src="../lib/vue/vue.min.js" charset="utf-8"></script>
+<script src="../modules/common.js"></script>
+<script>
+  // 超过1w以万为单位 留2位小数
+  function fw2 (val) {
+    if (val === '' || val === null || val === undefined) {
+      return val
+    }
+    let tenW = val / 1000000
+    if (tenW >= 1) {
+      return (val / 1000000).toFixed(2) + '万'
+    }
+    return (val / 100).toFixed(2)
+  }
+  function fw (val) {
+    if (val === '' || val === null || val === undefined) {
+      return val
+    }
+    let tenW = val / 10000
+    if (tenW >= 1) {
+      return parseFloat(tenW.toFixed(2)) + '万'
+    }
+    return val
+  }
+  window.$ = layui.$
+var app5 = new Vue({
+    el:"#app",
+    data(){
+      return {
+        loading: false,
+        list:[],
+        timestamp:0,
+        limit:10,
+          isChild:true
+      }
+    },
+    mounted:function(){
+        this.init();
+    },
+    methods: {
+        init: function init() {
+            var event=this;
+            checkLogin(function() {
+                event.lists()
+                app5.isChild=user.isChild ? false : true;
+            })
+        },
+      lists() {
+          getList(this.timestamp).then(order => {
+              if (order.length > 0) {
+                  order.forEach(element => {
+                    this.list.push(element)
+                  })
+              }
+              if (order.length < this.limit) {
+                  return
+              }
+          })      
+      },
+      getMoreInfo() {
+          var _this = this
+          getList(_this.timestamp).then(order => {
+              if (order.length > 0) {
+                  order.forEach(element => {
+                    _this.list.push(element)
+                  })
+              }
+              if (order.length < this.limit) {
+                  return
+              }
+              _this.loading = false
+          })
+      },
+        tishi:function(classes,msg){
+            layer.tips(msg, classes, {
+                tips: [1, 'rgba(0, 0, 0, 0.6)'],//还可配置颜色
+                time:2000
+            });
+        },
+      trigger(dom, cb) {
+          var height = dom.clientHeight
+          var scrollTop = dom.scrollTop
+          var scrollHeight = dom.scrollHeight
+          if (scrollTop + height + 20 > scrollHeight) {
+              cb && cb()                
+          }
+      },
+     orderScroll() {  //加载更多
+          var _this = this
+          var dom = this.$refs.orderScroll
+          this.trigger(dom, function () {
+              console.log(_this.loading)
+              if (_this.loading === true) {
+                  return
+              }
+              _this.loading = true
+              _this.timestamp = _this.list[_this.list.length - 1].create_timestamp || 0
+              _this.getMoreInfo()
+
+          })
+      },
+    }
+  })
+  // 获取股票列表
+  function getList(timestamp) {
+    var data = {
+      timestamp:timestamp,
+        tvmid:user.tvmid
+    }
+    return $.get(`${HOST.server}/stock/usableList`,data).then(predeal)
+  }
+
+
+function  getLine(event){
+    $(event).parents(".ivu-dropdown").children(".ivu-select-dropdown").toggle()
+  }
+</script>
+</body>
+</html>

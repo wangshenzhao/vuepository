@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>资产</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="stylesheet" href="../lib/layui/dist/css/layui.css" media="all">
+  <link rel="stylesheet" href="../css/app.css">
+</head>
+<style>
+    th { background: #f8f8f8}
+</style>
+<body>
+<div class="layout" id="app" v-cloak>
+  <div class="layout-head">
+    <div class="layout-head-logo">
+      <img src="../img/logo.png">
+    </div>
+    <div class="layout-head-logout">
+      <img src="../img/logo.png" class="user-head">
+      <a class="user-logout" style="cursor:pointer" onclick="userLogout()">退出登录</a>
+
+    </div>
+    <div class="layout-head-menu">
+      <ul class="layui-nav">
+        <li class="layui-nav-item">
+          <a href="./market.html">行情交易</a>
+        </li>
+        <li class="layui-nav-item">
+          <a href="./big-deal.html">大宗交易</a>
+        </li>
+        <li class="layui-nav-item layui-this">
+          <a href="./asset_browse.html">我的资产</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="layout-bd">
+    <div class="layout-side asset">
+      <ul class="asset-menu">
+        <li class="asset-menu-item">
+          <a href="" class="link">
+            <span class="shu-icon"></span>
+            我的账户
+          </a>
+          <ul>
+            <li class="asset-menu-item second active">
+              <a href="" class="link">
+                <span class="kuai-icon"></span>
+                账户总览
+              </a>
+            </li>
+            <li class="asset-menu-item second">
+              <a href="./asset.html" class="link">
+                <span class="kuai-icon"></span>
+                我的持仓
+              </a>
+            </li>
+              <li class="asset-menu-item second">
+                  <a href="./asset_buying.html" class="link">
+                      <span class="kuai-icon"></span>
+                      我的抢购
+                  </a>
+              </li>
+          </ul>
+        </li>
+        <li class="asset-menu-item" >
+          <a href="" class="link">
+            <span class="shu-icon"></span>
+            其他
+          </a>
+          <ul>
+            <li class="asset-menu-item second" v-if="isChild">
+              <a href="./children.html" class="link">
+                <span class="kuai-icon"></span>
+                子账户
+              </a>
+            </li>
+              <li class="asset-menu-item second">
+                  <a href="./edit_password.html" class="link">
+                      <span class="kuai-icon"></span>
+                      修改密码
+                  </a>
+              </li>
+            <!--<li class="asset-menu-item second">
+              <a href="http://dshb-cdn.mtq.tvm.cn/static/release/html/tvhTD_lovetime/tuwen/56/1e/3e/935B3G9MAA_1.html" target="_blank" class="link">
+                <span class="kuai-icon"></span>
+                  帮助及规则
+              </a>
+            </li>-->
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="layout-main">
+      <div class="assets-info">
+        <div class="info-money">
+          <h2 class="info-title">可提现金额</h2>
+          <div class="info-action">
+            <span class="money" @mouseover="tishi('.money',myHoldeMoey.money/100)">{{fw3(myHoldeMoey.money)}}元</span>
+            <button class="btn-pick" @click="applay()">提现</button>
+          </div>
+        </div>
+        <div class="info-detail">
+          <div class="detail-item time">
+            <div class="hold_number_sum" @mouseover="tishi('.hold_number_sum',myHoldeMoey.hold_number_sum)">{{fw(myHoldeMoey.hold_number_sum)}}秒</div>
+            <p>已购时间</p>
+          </div>
+          <div class="detail-item sum">
+            <div class="sum_money" @mouseover="tishi('.sum_money',myHoldeMoey.sum_money/100)">{{fw2(myHoldeMoey.sum_money)}}元</div>
+            <p>总资产</p>
+          </div>
+          <div class="detail-item award">
+            <div class="breakeven_price_sum" @mouseover="tishi('.breakeven_price_sum',myHoldeMoey.breakeven_price_sum/100)">{{fw2(myHoldeMoey.breakeven_price_sum)}}元</div>
+            <p>总盈亏</p>
+          </div>
+        </div>
+      </div>
+      <div class="assets-list" style="height: 400px;overflow:auto;" ref="orderScroll" v-on:scroll.passive="orderScroll">
+        <div class="list-table">
+          <h2 class="list-table-title">交易记录</h2>
+          <div class="list-table-bd">
+            <table class="layui-table order-table" lay-skin="line">
+              <colgroup>
+                <col>
+                <col>
+                <col>
+              </colgroup>
+                <thead>
+              <tr>
+                <th>创建时间</th>
+                <th>频道</th>
+                <th>金额</th>
+                <th>状态</th>
+              </tr>
+              </thead>
+              <tbody>
+                <tr  v-for="item in list">
+                  <td><p>{{item.dateTimeStr}}</p></td>
+                  <td>{{item.note}}</td>
+                  <td>
+                    <span v-bind:class="{up:item.isUp,down:item.isdown}">{{item.prefix}}{{item.money}}{{item.tax_final}}</span>
+                  </td>
+                  <td>{{item.ext.typeNote}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../lib/layui/dist/layui.all.js" charset="utf-8"></script>
+<script src="../lib/host.js"></script>
+<script src="../modules/common.js"></script>
+<script src="../lib/vue/vue.min.js" charset="utf-8"></script>
+<script>
+  // 超过1w以万为单位 留2位小数
+ function fw2 (val) {
+    if (val === '' || val === null || val === undefined) {
+      return val
+    }
+    let tenW = val / 1000000
+    if (tenW >= 1) {
+       return Math.floor(val / 10000)/100 + '万'
+    }
+    return (val / 100).toFixed(2)
+  }
+  // 超过1w以万为单位 留2位小数
+  function fw3 (val) {
+      if (val === '' || val === null || val === undefined) {
+          return val
+      }
+      let tenW = val / 1000000
+      if (tenW >= 1) {
+          return Math.floor(val / 10000)/100 + '万'
+      }
+      return (val / 100).toFixed(2)
+  }
+
+  function fw (val) {
+    if (val === '' || val === null || val === undefined) {
+      return val
+    }
+    let tenW = val / 10000
+    if (tenW >= 1) {
+      return parseFloat(tenW.toFixed(2)) + '万'
+    }
+    return val
+  }
+  window.$ = layui.$
+  var app5 = new Vue({
+    el: '#app',
+    data: {
+      list:[],
+      myHoldeMoey:{},
+      page:0,
+      limit: 5,
+        isChild:true
+    },
+    mounted:function(){
+        this.init();
+    },
+    methods :{
+        init: function init() {
+            var event=this;
+            checkLogin(function() {
+                event.lists();
+                event.myhodeMoney();
+                app5.isChild=user.isChild ? false : true;
+            })
+        },
+      lists() {
+          getList(this.page,this.limit).then(order => {
+              if (order.list.length > 0) {
+                  order.list.forEach(val => {
+                      val.prefix='';
+                      val.gnStr='';
+                      val.tax_final="(手续费￥"+fw2(val.ext.tax_final || 0)+")"
+                      if(val.type===5 || val.type===6) {
+                        val.prefix = val.money > 0 ? '+' : ''
+
+
+                        if (val.money > 0) {
+                          val.isUp = true;
+                          val.isdown = false;
+                        } else {
+                          val.isUp = false;
+                          val.isdown = true;
+                        }
+                      }
+                      val.money=fw2(val.money);
+                      this.list.push(val)
+                  })
+              }
+
+              if (order.list.length < this.limit) {
+                  return
+              }
+          })      
+      },
+      getMoreInfo() {
+          var _this = this
+          getList(_this.page,_this.limit).then(order => {
+              if (order.list.length > 0) {
+                  order.list.forEach(val => {
+                      val.prefix='';
+                      val.gnStr='';
+                      val.tax_final="(手续费￥"+fw2(val.ext.tax_final || 0)+")"
+                      if(val.type===5 || val.type===6) {
+                        val.prefix = val.money > 0 ? '+' : ''
+
+                        if (val.money > 0) {
+                          val.isUp = true;
+                          val.isdown = false;
+                        } else {
+                          val.isUp = false;
+                          val.isdown = true;
+                        }
+                      }
+                      val.money=fw2(val.money);
+                      _this.list.push(val)
+                  })
+              }
+              if (order.list.length < this.limit) {
+                  return
+              }
+              _this.loading = false
+          })
+      },
+      trigger(dom, cb) {
+          var height = dom.clientHeight
+          var scrollTop = dom.scrollTop
+          var scrollHeight = dom.scrollHeight
+          if (scrollTop + height + 20 > scrollHeight) {
+              cb && cb()                
+          }
+      },
+      orderScroll() {  //加载更多
+          var _this = this
+          var dom = this.$refs.orderScroll
+          this.trigger(dom, function () {
+              console.log(_this.loading)
+              if (_this.loading === true) {
+                  return
+              }
+              _this.loading = true
+              _this.page = _this.page+1
+              _this.getMoreInfo()
+          })
+      },
+      myhodeMoney:function(){
+          var data = {
+            tvmid:user.tvmid
+          }
+          $.get(`${HOST.server}/stock/myHoldMoney`, data,function(msg){
+              var account=msg.data;
+            return app5.myHoldeMoey=account
+
+          })
+        },
+   tishi:function(classes,msg){
+       if(isNaN(msg)){
+           return false;
+       }
+      layer.tips(msg, classes, {
+          tips: [1, 'rgba(0, 0, 0, 0.6)'],//还可配置颜色
+          time:2000
+      });
+  },
+      applay:function(){
+
+        location.href="./pickup.html"
+      }
+    }
+  })
+  // 获取股票列表
+  function getList(page,pageSize) {
+    var data = {
+      page: page,
+      tvmid:user.tvmid,
+      pagesize:pageSize
+    }
+    return $.get(`${HOST.pmall}/open/miaoaccount/logs`, data).then(predeal)
+  }
+
+
+</script>
+</body>
+</html>

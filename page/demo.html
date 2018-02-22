@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>交易系统后台模板</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+
+    <link rel="stylesheet" href="../lib/layui/dist/css/layui.css" media="all">
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+<body>
+
+<div class="layout">
+    <div class="header">
+        <div class="logo">
+            <img src="../img/logo.png">
+        </div>
+        <div class="user">user</div>
+        <div class="menu">menu</div>
+    </div>
+    <div class="container">
+        <div class="side"></div>
+        <div class="main"></div>
+    </div>
+</div>
+
+<div>
+    <ul id="tvlist">
+
+    </ul>
+</div>
+
+<script src="../lib/layui/dist/layui.all.js" charset="utf-8"></script>
+<script>
+    layui.config({
+        debug: true //用于开启调试模式，默认false，如果设为true，则JS模块的节点会保留在页面
+        ,base: '/modules/' //设定扩展的Layui模块的所在目录，一般用于外部模块扩展
+    });
+    layui.use('Tools',function(){
+        var $ = layui.jquery;
+        layui.curlTool(
+                'http://t.tvm.cn/stock/getTvsList',
+                'get',
+                'json',
+                {},
+                function (res) {
+                    var lis = [];
+                    layui.each(res.data.list,function(index,item){
+                        lis.push('<li>'+item.nickname+"   "+item.commodity_price+"</li>");
+                    })
+                    $('#tvlist').append(lis.join(''));
+                }
+        );
+    });
+
+
+</script>
+</body>
+</html>

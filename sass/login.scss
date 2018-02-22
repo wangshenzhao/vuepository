@@ -1,0 +1,93 @@
+.login-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.login-header {
+  background-color: #f5f5f5;
+  padding: 15px 15px 15px 70px;
+
+  color: #495060;
+
+  & > div {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .login-logo {
+    img {
+      vertical-align: top;
+      height: 40px;
+    }
+  }
+  .login-divider {
+    font-size: 22px;
+    margin: 0 15px;
+  }
+  .login-words {
+    font-size: 20px;
+  }
+}
+.login-bd {
+  flex: 1;
+  position: relative;
+  background-image: url("../img/login-bg.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 50%;
+}
+.login-form {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin-top: -20px;
+}
+.login-form-cnt {
+  width: 385px;
+  background-color: #fff;
+  padding: 45px 35px;
+}
+.login-foot {
+  font-size: 14px;
+  color: #fff;
+  text-align: center;
+  line-height: 1;
+  padding: 30px 0;
+}
+.login-form-title {
+  text-align: center;
+  font-size: 25px;
+  line-height: 1;
+  margin-bottom: 40px;
+  font-weight: normal;
+}
+.login-input {
+  height: 50px;
+  font-size: 16px;
+}
+.login-btn {
+  height: 50px;
+  font-size: 16px;
+  padding: 0 10px;
+}
+.form-prepend {
+  .layui-input {
+    padding-left: 40px;
+  }
+
+  .prepend-icon {
+    position: absolute;
+    top: 12px;
+    left: 6px;
+    color: #b6b6b6;
+    svg {
+      width: 26px;
+      height: 26px;
+      fill: currentColor;
+    }
+  }
+}
+input::placeholder {
+  color: #b6b6b6;
+}

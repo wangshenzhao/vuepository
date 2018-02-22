@@ -1,0 +1,142 @@
+.big-deal {
+  background-color: #f0f3f5;
+}
+.big-menu-item {
+  text-align: center;
+  line-height: 46px;
+  border-bottom: 1px solid #cccccc;
+  font-size: 17px;
+  color: #586379;
+  cursor: pointer;
+
+  svg {
+    width: 22px;
+    height: 22px;
+    vertical-align: -0.3em;
+    margin-right: 20px;
+    color: #aeb9ca;
+    fill: currentColor;
+  }
+
+  &.active {
+    border-bottom: none;
+    background-color: #2f415c;
+    color: #fa9236;
+
+    svg {
+      color: #fa9236;
+    }
+  }
+}
+.big-action {
+  text-align: right;
+  padding: 20px 26px;
+  border-bottom: 1px solid #ebebeb;
+}
+.big-deal-btn {
+  display: inline-block;
+  padding: 6px 8px;
+  text-align: center;
+  border: 1px solid;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+
+  & + & {
+    margin-left: 20px;
+  }
+
+  .big-deal-icon {
+    display: inline-block;
+    vertical-align: middle;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    text-align: center;
+    padding: 2px 0;
+
+    svg {
+      fill: #fff;
+      width: 25px;
+      height: 25px;
+    }
+  }
+
+  &.buy {
+    background-color: #fefdf4;
+    border-color: #fbdeb0;
+    .big-deal-icon {
+      background-color: #fd9700;
+    }
+
+    &:hover {
+      background-color: darken(#fefdf4, 10%);
+    }
+  }
+
+  &.sell {
+    background-color: #ebf6fb;
+    border-color: #bdd8f2;
+    .big-deal-icon {
+      background-color: #007cff;
+    }
+
+    &:hover {
+      background-color: darken(#ebf6fb, 10%);
+    }
+  }
+
+  &.order {
+    background-color: #f5cefb;
+    border-color: #fbb4f3;
+    .big-deal-icon {
+      background-color: #fb92c1;
+    }
+
+    &:hover {
+      background-color: darken(#f5cefb, 10%);
+    }
+  }
+}
+.big-order {
+  padding: 20px;
+}
+.big-order-msg {
+  padding: 10px 0 10px 130px;
+}
+.layui-table.order-table {
+  th, td {
+    text-align: center;
+  }
+
+  thead tr {
+    background-color: #fff;
+
+    th {
+      font-size: 13px;
+    }
+  }
+}
+.order-channel-logo {
+  width: 60px;
+  height: 60px;
+  vertical-align: top;
+}
+.order-channel-date {
+  color: #a0a0a0;
+}
+.order-channel-btn {
+  -webkit-appearance: none;
+  line-height: 30px;
+  text-align: center;
+  color: #fff;
+  padding: 0 20px;
+  border: none;
+  background-color: #b54745;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darken(#b54745, 10%);
+  }
+}

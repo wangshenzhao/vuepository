@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>资产</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="stylesheet" href="../lib/layui/dist/css/layui.css" media="all">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../lib/iview/styles/iview.css">
+</head>
+<style>
+  .ivu-form-item {width: 400px;}
+  .red{color:red}
+  </style>
+<body>
+<div class="layout" id="app" v-cloak>
+  <div class="layout-head">
+    <div class="layout-head-logo">
+      <img src="../img/logo.png">
+    </div>
+    <div class="layout-head-logout">
+      <img src="../img/logo.png" class="user-head">
+      <a class="user-logout" style="cursor:pointer" onclick="userLogout()">退出登录</a>
+    </div>
+    <div class="layout-head-menu">
+      <ul class="layui-nav">
+        <li class="layui-nav-item">
+          <a href="./market.html">行情交易</a>
+        </li>
+        <li class="layui-nav-item">
+          <a href="./big-deal.html">大宗交易</a>
+        </li>
+        <li class="layui-nav-item layui-this">
+          <a href="asset_browse.html">我的资产</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="layout-bd">
+    <div class="layout-side asset">
+      <ul class="asset-menu">
+        <li class="asset-menu-item">
+          <a href="" class="link">
+            <span class="shu-icon"></span>
+            我的账户
+          </a>
+          <ul>
+            <li class="asset-menu-item second active">
+              <a href="./asset_browse.html" class="link">
+                <span class="kuai-icon"></span>
+                账户总览
+              </a>
+            </li>
+            <li class="asset-menu-item second ">
+              <a href="./asset.html" class="link">
+                <span class="kuai-icon"></span>
+                我的持仓
+              </a>
+            </li>
+            <li class="asset-menu-item second">
+              <a href="./asset_buying.html" class="link">
+                <span class="kuai-icon"></span>
+                我的抢购
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="asset-menu-item" >
+          <a href="" class="link">
+            <span class="shu-icon"></span>
+            其他
+          </a>
+          <ul>
+            <li class="asset-menu-item second" v-if="isChild">
+              <a href="./children.html" class="link">
+                <span class="kuai-icon"></span>
+                子账户
+              </a>
+            </li>
+            <li class="asset-menu-item second">
+              <a href="./edit_password.html" class="link">
+                <span class="kuai-icon"></span>
+                修改密码
+              </a>
+            </li>
+            <!--<li class="asset-menu-item second">
+               <a href="http://dshb-cdn.mtq.tvm.cn/static/release/html/tvhTD_lovetime/tuwen/56/1e/3e/935B3G9MAA_1.html" target="_blank" class="link">
+                 <span class="kuai-icon"></span>
+                 帮助及规则
+               </a>
+             </li>-->
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="layout-main">
+      <div class="assets-list">
+        <div class="list-table">
+          <div class="list-table-bd">
+            <div class="user-content user-cnt" style="min-height: 434px;">
+              <form class="pick-form ivu-form ivu-form-label-right">
+                <div class="ivu-form-item">
+                  <label class="ivu-form-item-label" style="width: 100px;">开户名：</label>
+                  <div class="ivu-form-item-content" style="margin-left: 100px;">{{info.company}} <!---->
+                  </div></div> <div class="ivu-form-item"><label class="ivu-form-item-label" style="width: 100px;">开户行：</label>
+                <div class="ivu-form-item-content" style="margin-left: 100px;">{{info.bankName}} <!---->
+                </div>
+              </div>
+                <div class="ivu-form-item">
+                  <label class="ivu-form-item-label" style="width: 100px;">开户卡号：</label>
+                  <div class="ivu-form-item-content" style="margin-left: 100px;">{{info.card}} <!---->
+                  </div>
+                </div>
+                <div class="ivu-form-item"><label class="ivu-form-item-label" style="width: 100px;">账户金额：</label>
+                  <div class="ivu-form-item-content" style="margin-left: 100px;">{{(parseInt(accInfo.money)/100).toFixed(2)}} 元<!----></div>
+                </div>
+                <div class="ivu-form-item"><label class="ivu-form-item-label" style="width: 100px;">提现金额：</label>
+                  <div class="ivu-form-item-content" style="margin-left: 100px;">
+                    <div class="ivu-input-wrapper ivu-input-wrapper-large ivu-input-type ivu-input-group ivu-input-group-large ivu-input-group-with-append ivu-input-hide-icon"><!---->
+                      <!----> <i class="ivu-icon ivu-icon-load-c ivu-load-loop ivu-input-icon ivu-input-icon-validate"></i>
+                      <input autocomplete="off" name="applyMoney" type="text" placeholder="提现金额" class="ivu-input ivu-input-large">
+                      <div class="ivu-input-group-append" style="">
+                        <span>元</span></div></div> <!----></div>
+                </div>
+                <div class="ivu-form-item"><!---->
+                  <div class="ivu-form-item-content" style="margin-left: 100px;">
+                    <button type="button"  @click="onsubmit()" class="ivu-btn ivu-btn-warning ivu-btn-long ivu-btn-large" style="margin-top: 22px;"><!---->
+                      <!----> <span>申请提现</span></button> <!----></div></div>
+              </form>
+              <div class="pick-desc"><p>1、我们将在<span class="red">1</span>个工作日之内与您电话联系，将提现金额转入您指定的银行卡中，实际到账时间根据银行不同有所差异。</p>
+                <p>2、单笔提现金额最高<span class="red">{{max/10000}}w</span>，每日提现额度最高<span class="red">100w</span>。</p> <p>3、手续费按笔数收取，每笔<span class="red">{{ taxFee }}元</span>。</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../lib/layui/dist/layui.all.js" charset="utf-8"></script>
+<script src="../lib/host.js"></script>
+<script src="../modules/common.js"></script>
+<script src="../lib/vue/vue.min.js" charset="utf-8"></script>
+<script>
+  // 超过1w以万为单位 留2位小数
+  function fw2 (val) {
+    if (val === '' || val === null || val === undefined) {
+      return val
+    }
+    let tenW = val / 1000000
+    if (tenW >= 1) {
+      return (val / 1000000).toFixed(2) + '万'
+    }
+    return (val / 100).toFixed(2)
+  }
+  function fw (val) {
+    if (val === '' || val === null || val === undefined) {
+      return val
+    }
+    let tenW = val / 10000
+    if (tenW >= 1) {
+      return parseFloat(tenW.toFixed(2)) + '万'
+    }
+    return val
+  }
+  window.$ = layui.$
+  var app5 = new Vue({
+    el: '#app',
+    data: {
+      pickMoney: '',
+      loading: false,
+      taxFee: 0.7,
+      max: 50000,
+      info:{},
+      accInfo:{},
+      isChild:true
+    },
+    mounted:function(){
+      this.userInfo();
+    },
+    methods :{
+      userInfo:function(){
+        var event=this;
+        checkLogin(function(){
+          event.account();
+         app5.isChild=user.isChild ? false : true;
+          return app5.info=user
+        })
+
+      },
+      account:function(){
+        var data={
+          tvmid:user.tvmid
+        }
+        $.get(`${HOST.server}/stock/myHoldMoney`,data,function(msg){
+          var account=msg.data;
+            return app5.accInfo=account;
+        })
+
+      },
+      //申请提现
+      onsubmit:function(){
+        var money=$("input[name='applyMoney']").val();
+        if (!money) {
+          return tanchuang('请输入提现金额')
+        }
+        if (!/^[1-9]\d*\.?\d{0,2}?$/.test(money)) {
+          return tanchuang('请输入正确金额,最多2位小数')
+        }
+        if (money* 100 > this.accInfo.money) {
+          return tanchuang('提现金额大于账户余额')
+        }
+        layer.confirm('你确定要提现么？', function(index){
+          //提交表单
+          var data={money:money}
+          $.post(`${HOST.server}/stock/applyCash`,data,function(msg){
+            if(msg.status!='success'){
+              errMsg(msg.errMsg,5);
+            }else{
+              setTimeout(errMsg('您的申请已提交'), 300)
+            }
+
+          })
+          layer.close(index);
+        });
+
+      }
+    }
+  })
+  function tanchuang(msg){
+    layer.msg(msg, {icon: 5});
+  }
+  //错误信息提示
+  function errMsg(msg,type){
+    layer.open({
+      title: '提示'
+      ,content: msg
+      ,icon: type
+    });
+  }
+</script>
+</body>
+</html>

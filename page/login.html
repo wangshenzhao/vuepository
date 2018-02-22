@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>登录</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="stylesheet" href="../lib/layui/dist/css/layui.css" media="all">
+  <link rel="stylesheet" href="../css/app.css">
+</head>
+<style>
+  .login-input:focus{border-color: red !important;}
+  </style>
+<body>
+<div class="login-container">
+  <div class="login-header" style="background: #3d506f">
+    <div class="login-logo">
+      <img src="../img/logo.png">
+    </div>
+    <div class="login-divider" style="color:#fff;">|</div>
+    <div class="login-words" style="color:#fff;">欢迎登录</div>
+  </div>
+  <div class="login-bd">
+    <div class="login-form">
+      <div class="login-form-cnt">
+        <h3 class="login-form-title">互动时间账号登录</h3>
+        <form class="layui-form" onsubmit="return false;">
+          <div class="layui-form-item">
+            <div class="layui-col-xs12 form-prepend">
+              <div class="prepend-icon">
+                <svg viewBox="0 0 1024 1024" version="1.1" class="sign-name"><path d="M756.367 103.424H267.634c-20.239 0-36.656 15.964-36.656 35.658v745.834c0 19.694 16.416 35.659 36.656 35.659h488.734c20.239 0 36.655-15.964 36.655-35.659V139.083c-0.001-19.694-16.416-35.659-36.656-35.659z m0 781.493H267.634V757.146h488.734v127.771z m0-163.429H267.634V139.083h488.734v582.405zM512.005 858.174c23.615 0 42.763-18.622 42.763-41.6 0-22.973-19.148-41.601-42.763-41.601-23.624 0-42.773 18.628-42.773 41.601 0 22.978 19.149 41.6 42.773 41.6z"></path></svg>
+              </div>
+              <input type="text" name="phone" lay-verify="required" placeholder="请输入手机号" autocomplete="off" class="layui-input login-input" onblur="regPhone()">
+            </div>
+            <div style="font-size:12px;color:red; height:14px; clear:both; " class="redMsg"></div>
+          </div>
+          <div class="layui-form-item layui-row layui-col-space8">
+            <div class="layui-col-xs12">
+              <input type="password" name="password1" lay-verify="required" placeholder="密码" autocomplete="off" class="layui-input login-input">
+            </div>
+            <div style="font-size:12px;color:red; height:14px; clear:both; " class="password1"></div>
+          </div>
+          <div class="layui-form-item layui-row layui-col-space8">
+            <div class="layui-col-xs7">
+              <input type="text" name="password" lay-verify="required" placeholder="动态密码" autocomplete="off" class="layui-input login-input" >
+            </div>
+            <div class="layui-col-xs5">
+              <span class="layui-btn layui-btn-primary layui-btn-fluid login-btn  msgCode" style="line-height: 46px;" onclick="smsSend(this)">发送验证码</span>
+            </div>
+            <div style="color:red; font-size: 12px; height:14px; clear:both;"  class="doutai"></div>
+          </div>
+          <div class="layui-form-item" style="margin-top: 30px">
+            <div class="layui-col-xs12">
+              <button class="layui-btn layui-btn-normal layui-btn-fluid login-btn" onclick="logsfun()">登录</button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+      <div class="login-foot">版权所有©天脉聚源 2008-2018保留一切权利</div>
+    </div>
+  </div>
+</div>
+<script src="../lib/host.js"></script>
+<script src="../lib/layui/dist/layui.all.js" charset="utf-8"></script>
+<script>
+  window.$ = layui.$
+  function smsSend(event){
+    var phone=$("input[name='phone']").val();
+    var disablesd= $(event).attr("disabled");
+    console.log(disablesd);
+   if(disablesd){
+     return
+   }
+    if(phone==''){
+      $(".redMsg").html("请输入手机号");
+      tanchuang('','请输入手机号')
+      $("input[name='phone']").focus();
+    }else{
+      if(!regPhone()){
+         return false;
+      }
+      var evnt=event
+      $.ajax({
+        url:`${HOST.server}/stock/sendCode`,
+        type:'post',
+        data:{"userName":phone},
+        success:function(data){
+          if(data && data.status=='success'){
+            $(evnt).attr("disabled",true);
+            $(evnt).addClass("layui-btn-disabled");
+
+            $(".msgCode").html(data.data);
+            var i=59
+            var interval=setInterval(function(){
+              $(".msgCode").html(i+"s");
+              i--;
+            },1000)
+            setTimeout(function(){
+              clearInterval(interval);
+              $(".msgCode").html("发送验证码");
+              $(evnt).attr("disabled",false);
+              $(evnt).removeClass("layui-btn-disabled");
+            },60*1000)
+
+          }else{
+            tanchuang("auto",data.errMsg)
+          }
+        }
+      })
+
+    }
+  }
+  function regPhone(){
+    var preg=/^1\d{10}$/
+    var phone=$("input[name='phone']").val();
+    var sta=preg.test(phone);
+    if(!sta){
+      $(".redMsg").html("手机号格式不正确");
+      $("input[name='phone']").focus();
+      return false;
+    }else{
+      $(".redMsg").html("");
+      return phone;
+    }
+  }
+  $("input[name='password']").keydown(function(){
+    regWord();
+  })
+  $("input[name='password1']").keydown(function(){
+    $(".password1").html("");
+  })
+  function logsfun(){
+    var phone=regPhone()
+    if(!phone){
+        return false;
+    }
+    var password1=$("input[name='password1']").val();
+    if(password1==''){
+      $("input[name='password1']").focus()
+      $(".password1").html("请填写密码");
+      return false;
+    }else{
+      $(".password1").html("");
+    }
+    var smsCode=$("input[name='password']").val();
+    if(smsCode==''){
+      $("input[name='password']").focus()
+      $(".doutai").html("请填写验证码");
+      return false;
+    }else{
+      $(".doutai").html("");
+    }
+
+    if(!regWord()){
+      return false
+    }
+    $.ajax({
+      type:'post',
+      url:`${HOST.server}/stock/login`,
+      data:{userName:phone,code:smsCode,password:password1},
+      success:function (data){
+        if(data && data.status=='success'){
+            location.href="./market.html";
+        }else{
+          tanchuang('auto','登录失败')
+        }
+      }
+
+    })
+  }
+  function tanchuang(type,msg){
+    layer.msg(msg, {icon: 5});
+  }
+  function regWord(){
+    var val=$("input[name='password']").val();
+    var peg=/[a-zA-Z]/;
+    if(peg.test(val)){
+      $(".doutai").html("密码只能是数字");
+      $("input[name='password']").focus();
+      return false;
+    }else{
+      $(".doutai").html('');
+      return true;
+    }
+  }
+</script>
+</body>
+</html>

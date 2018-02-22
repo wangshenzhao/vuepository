@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>资产</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="stylesheet" href="../lib/layui/dist/css/layui.css" media="all">
+  <link rel="stylesheet" href="../css/app.css">
+    <script src="../lib/jquery/jquery.min.js"></script>
+</head>
+<body>
+<table id="app" ref="table" @click="list()">
+    <tr>
+        <th>用户名</th>
+      <th>时间</th>
+  </tr>
+  <tr>
+      <td>{{listData.count}}</td>
+      <td>2</td>
+  </tr>
+  </table>
+<script src="../lib/layui/dist/layui.all.js" charset="utf-8"></script>
+<script src="../lib/vue/vue.min.js" charset="utf-8"></script>
+<script>
+    window.$ = layui.$
+  var app5 = new Vue({
+    el: '#app',
+    data: {
+      message: 'Hello Vue.js!',
+        listData:{}
+    },
+      mounted:function(){
+          this.list();
+      },
+      methods :{
+          list:function() {
+              var data = {
+                  page: 0,
+                  tvmid:'bst5a13c964fc875e6a528b4567',
+                  pagesize:10
+              }
+              $.get('http://qa.pmall.yaotv.tvm.cn/open/miaoaccount/logs', data,function(msg){
+                  return app5.listData=msg.data
+              })
+          }
+      }
+  })
+  </script>
+</body>
+</html>

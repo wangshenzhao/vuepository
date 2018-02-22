@@ -1,0 +1,142 @@
+.asset-menu-item {
+  .link {
+    height: 46px;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    padding-left: 20px;
+    border-bottom: 1px solid #d1d1d1;
+    color: #6b7d94;
+    font-size: 17px;
+    cursor: pointer;
+    background-color: #f8f8f8;
+
+    .shu-icon {
+      width: 3px;
+      height: 1em;
+      background-color: #6b7d94;
+      border-radius: 1000px;
+      margin-right: 14px;
+    }
+
+    .kuai-icon {
+      width: 6px;
+      height: 6px;
+      background-color: #adb8c9;
+      margin-right: 10px;
+    }
+  }
+
+  &.second {
+    .link {
+      padding-left: 40px;
+      font-size: 14px;
+      transition: all .3s;
+      background-color: #f0f3f5;
+
+      &:hover {
+        background-color: #33455e;
+        color: #fc9536;
+
+        .kuai-icon {
+          background-color: #fc9536;
+        }
+      }
+    }
+  }
+
+  &.active {
+    & > .link {
+      background-color: #33455e;
+      color: #fc9536;
+
+      .kuai-icon {
+        background-color: #fc9536;
+      }
+    }
+  }
+}
+.assets-info {
+  padding: 22px;
+  display: flex;
+  border-bottom: 1px solid #e6e6e6;
+  justify-content: space-between;
+  background: #f8f8f8;
+}
+.assets-list {
+  padding: 22px;
+}
+.info-title {
+  color: #374256;
+  margin-bottom: 12px;
+}
+.info-action {
+  .money {
+    font-size: 28px;
+    line-height: 1;
+    color: #fe0101;
+  }
+  .btn-pick {
+    line-height: 30px;
+    text-align: center;
+    border-radius: 3px;
+    background-color: #f95105;
+    color: #fff;
+    font-size: 14px;
+    border: none;
+    min-width: 70px;
+    margin-left: 26px;
+    vertical-align: 5px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: darken(#f95105, 10%);
+    }
+  }
+}
+.info-detail {
+  font-size: 0;
+}
+.detail-item {
+  font-size: 17px;
+  min-width: 162px;
+  display: inline-block;
+  color: #fff;
+  text-align: center;
+  padding: 20px 10px;
+
+  & > div {
+    margin-bottom: 6px;
+  }
+
+  & + & {
+    margin-left: 40px;
+  }
+
+  &.time {
+    background-color: #75b734;
+  }
+  &.sum {
+    background-color: #f79515;
+  }
+  &.award {
+    background-color: #26a5d5;
+  }
+}
+
+.list-table-title {
+  display: inline-block;
+  color: #666;
+  font-size: 17px;
+  position: relative;
+  padding-bottom: 5px;
+
+  &:before {
+    content: '';
+    position: absolute;
+    bottom: 0px;
+    width: 130%;
+    height: 2px;
+    background-color: #fc9536;
+  }
+}
